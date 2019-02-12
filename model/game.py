@@ -1,6 +1,6 @@
-from classes.couleurCarte import *
-from classes.valeurCarte import *
-from classes.carte import *
+from model.couleurCarte import *
+from model.valeurCarte import *
+from model.carte import *
 from random import randint
 
 class Game:

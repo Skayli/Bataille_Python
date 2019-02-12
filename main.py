@@ -1,8 +1,8 @@
-from classes.couleurCarte import *
-from classes.valeurCarte import *
-from classes.carte import *
-from classes.joueur import *
-from classes.game import *
+from model.couleurCarte import *
+from model.valeurCarte import *
+from model.carte import *
+from model.joueur import *
+from model.game import *
 
 j1 = Joueur("j1")
 j2 = Joueur("j2")
