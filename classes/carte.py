@@ -34,5 +34,5 @@ class Carte:
         return self.valeur >= other.valeur
 
     # Surcharge de l'opérateur "=="
-    def __eq__(self, other):
+    def isMemeValeur(self, other):
         return self.valeur == other.valeur

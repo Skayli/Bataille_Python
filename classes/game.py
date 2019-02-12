@@ -47,26 +47,52 @@ class Game:
                 j.addCarte(self.listeCartes.pop(0))
 
     # Effectue un tour de jeu
-    def jouerTour(self):
-        # 1ère Etape : recherche des batailles
+    def jouerTour(self, listeJoueurs = None, listeCartesEnJeu = None):
 
-        sizeListe = len(self.listeJoueurs)
-        battlePatners = []
+        if listeJoueurs == None:
+            listeJoueurs = self.listeJoueurs
 
-        for i in range(0, sizeListe):
-            mustBattle = False
-            for j in range(i+1, sizeListe):
-                if(self.listeJoueurs[i].getCarteAJouer() == self.listeJoueurs[j].getCarteAJouer()):
-                    mustBattle = True
+        if listeCartesEnJeu == None:
+            listeCartesEnJeu = []
 
-            if mustBattle:
-                battlePatners.append(self.listeJoueurs[i])
+        # Chercher les batailles
+        battleCard = None
 
-        print(battlePatners)
+        for j1 in listeJoueurs:
+            for j2 in listeJoueurs:
+                if j1 != j2 and j1.getCarteAJouer().valeur ==  j2.getCarteAJouer().valeur:
+                    if battleCard == None or battleCard < j1.getCarteAJouer():
+                        battleCard = j1.getCarteAJouer()
 
-        # print("\nRésultat du tour")
-        # print(listeGagnants)
-        # print(listeCartesEnJeu)
+        if(battleCard != None):
+            participantsBataille = []
+
+            for j in listeJoueurs:
+                if j.getCarteAJouer().valeur == battleCard.valeur:
+                    participantsBataille.append(j)
+
+            for j in listeJoueurs:
+                listeCartesEnJeu.append(j.listeCartes.pop(0))
+                if j in participantsBataille:
+                    listeCartesEnJeu.append(j.listeCartes.pop(0))  #carte retournée du joueur
+
+            self.jouerTour(participantsBataille, listeCartesEnJeu)
+
+        else:
+            # Trouver le gagant et lui donner les cartes en jeu
+            gagnant = listeJoueurs[0]
+
+            for j in listeJoueurs:
+                if j.getCarteAJouer() > gagnant.getCarteAJouer():
+                    gagnant = j
+
+            for j in listeJoueurs:
+                print(j.getCarteAJouer())
+                listeCartesEnJeu.append(j.listeCartes.pop(0))
+
+
+            gagnant.listeCartes.extend(listeCartesEnJeu)
+            print("GAGNANT SEUL :\n" + str(j))
 
 
     def printListeJoueurs(self):
