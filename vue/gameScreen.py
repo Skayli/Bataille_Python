@@ -22,7 +22,7 @@ class GameScreen(Screen):
         self._dict_images.clear()
 
         if len(self._liste_cartes_en_jeu) > 0:
-            photo = ImageTk.PhotoImage(file= "D:\Atom_workspace\Python\Puissance_4\images\{0}.png".format(self._liste_cartes_en_jeu[0]))
+            photo = ImageTk.PhotoImage(file= "D:\Atom_workspace\Python\Bataille_Python\images\{0}.png".format(self._liste_cartes_en_jeu[0]))
             width = photo.width()
             height = photo.height()
 
@@ -35,7 +35,7 @@ class GameScreen(Screen):
             self._dict_images[self._liste_cartes_en_jeu[0]]= photo
 
             for image in self._liste_cartes_en_jeu[1:]:
-                photo = ImageTk.PhotoImage(file= "D:\Atom_workspace\Python\Puissance_4\images\{0}.png".format(image))
+                photo = ImageTk.PhotoImage(file= "D:\Atom_workspace\Python\Bataille_Python\images\{0}.png".format(image))
 
                 width = photo.width()
                 height = photo.height()
@@ -45,23 +45,23 @@ class GameScreen(Screen):
 
                 self._dict_images[image]= photo
 
-    def update_dictionnaire_images_v2(self):
-        # On vide le dictionnaire
-        self._dict_images.clear()
-
-        if len(self._liste_cartes_en_jeu) > 0:
-            x = 138
-            y = 300
-            for image in self._liste_cartes_en_jeu:
-                photo = ImageTk.PhotoImage(file= "D:\Atom_workspace\Python\Puissance_4\images\{0}.png".format(image))
-
-                width = photo.width()
-                height = photo.height()
-                x = x + width + (width/2)
-
-                print(x, ' ', y)
-
-                item = self._canvas.create_image(x,y,image=photo)
-
-                self._dict_images[image]= photo
-            print(self._dict_images)
+    # def update_dictionnaire_images_v2(self):
+    #     # On vide le dictionnaire
+    #     self._dict_images.clear()
+    #
+    #     if len(self._liste_cartes_en_jeu) > 0:
+    #         x = 138
+    #         y = 300
+    #         for image in self._liste_cartes_en_jeu:
+    #             photo = ImageTk.PhotoImage(file= "D:\Atom_workspace\Python\Puissance_4\images\{0}.png".format(image))
+    #
+    #             width = photo.width()
+    #             height = photo.height()
+    #             x = x + width + (width/2)
+    #
+    #             print(x, ' ', y)
+    #
+    #             item = self._canvas.create_image(x,y,image=photo)
+    #
+    #             self._dict_images[image]= photo
+    #         print(self._dict_images)

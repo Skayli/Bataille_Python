@@ -47,16 +47,18 @@ menuScreen = MenuScreen(cadre, 600, 600)
 cadre.getScreenManager().ajouterScreen(gameScreen.getType(), gameScreen)
 cadre.getScreenManager().ajouterScreen(menuScreen.getType(), menuScreen)
 
-cadre.getScreenManager().setScreenCourant(menuScreen.getType())
+cadre.getScreenManager().setScreenCourant(gameScreen.getType())
 
 controller = Controller(cadre, g)
 
-# cadre.affiche()
-
-x = 0.25
-while True:
-    menuScreen.getBoutonJouer().place(relx=x, rely=0.80)
-    # menuScreen.update()
-    cadre.affiche()
-    x += 0.1
-    print(x)
+cadre.affiche()
+cadre.mainloop()
+#
+# x = 0.25
+# while True:
+#     menuScreen.getBoutonJouer().place(relx=x, rely=0.80)
+#     # menuScreen.update()
+#     cadre.affiche()
+#     cadre.mainloop()
+#     x += 0.1
+#     print(x)
