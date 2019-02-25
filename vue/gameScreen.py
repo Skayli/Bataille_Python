@@ -36,7 +36,9 @@ class GameScreen(Screen):
             print(x, ' ', y)
             print('CANVAS DIMENSION ', self._canvas.cget('width'), self._canvas.cget('height'))
             item = self._canvas.create_image(x,y,image=photo)
+            self._canvas.tag_bind(item, '<B1-Motion>', lambda event: self.moveCard(event))
             self._dict_images[self._liste_cartes_en_jeu[0]]= photo
+
 
             for image in self._liste_cartes_en_jeu[1:]:
                 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
@@ -49,8 +51,12 @@ class GameScreen(Screen):
                 x = x + width + (width/2)
 
                 item = self._canvas.create_image(x,y,image=photo)
-
+                self._canvas.tag_bind(item,'<B1-Motion>', self.moveCard)
                 self._dict_images[image]= photo
+
+    def moveCard(self, event):
+        item = self._canvas.find_closest(event.x, event.y)
+        self._canvas.coords(item, event.x, event.y)
 
     # def update_dictionnaire_images_v2(self):
     #     # On vide le dictionnaire
