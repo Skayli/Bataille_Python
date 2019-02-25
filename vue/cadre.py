@@ -19,7 +19,7 @@ class Cadre(Frame):
         self.configure(width=800, height=800)
         # super(Cadre, self).__init__()
         # self.configure(background='blue')
-        # print(self.tk.keys())
+        # print(self.tk.keys())ccd
 
         self._screenManager = ScreenManager()
 

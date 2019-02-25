@@ -38,9 +38,9 @@ g.printListeJoueurs()
 
 root = Tk()
 
-# screenManager = ScreenManager()
+# screenManager = ScreenManagexr()
 cadre = Cadre(root, 900, 900, 'yellow')
-# cadre = Cadre(screenManager, 800, 600)
+# cadre = Cadre(screenManager, 80v0, 600)
 
 gameScreen = GameScreen(cadre, 600, 600, 'green')
 menuScreen = MenuScreen(cadre, 600, 600)
@@ -53,12 +53,3 @@ controller = Controller(cadre, g)
 
 cadre.affiche()
 cadre.mainloop()
-#
-# x = 0.25
-# while True:
-#     menuScreen.getBoutonJouer().place(relx=x, rely=0.80)
-#     # menuScreen.update()
-#     cadre.affiche()
-#     cadre.mainloop()
-#     x += 0.1
-#     print(x)
