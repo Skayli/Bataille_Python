@@ -24,7 +24,7 @@ class Cadre(Frame):
     def affiche(self):
         self.grid(row=0, column=0)
         self._screenManager.getScreenCourant().affiche()
-        self.mainloop()
+        # self.mainloop()
 
     def getRootPanel(self):
         return self._root
