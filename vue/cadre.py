@@ -31,3 +31,6 @@ class Cadre(Frame):
 
     def getScreenManager(self):
         return self._screenManager
+
+    def refresh(self):
+        print("test")
