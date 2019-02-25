@@ -4,6 +4,7 @@ from tkinter import *
 from PIL import Image,ImageTk
 from vue.utilitaire import *
 from vue.screen import *
+import os
 
 class GameScreen(Screen):
     """
@@ -22,7 +23,10 @@ class GameScreen(Screen):
         self._dict_images.clear()
 
         if len(self._liste_cartes_en_jeu) > 0:
-            photo = ImageTk.PhotoImage(file= "D:\Atom_workspace\Python\Puissance_4\images\{0}.png".format(self._liste_cartes_en_jeu[0]))
+            script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+            rel_path = "../images/{0}.png"
+            abs_file_path = os.path.join(script_dir, rel_path)
+            photo = ImageTk.PhotoImage(file= abs_file_path.format(self._liste_cartes_en_jeu[0]))
             width = photo.width()
             height = photo.height()
 
@@ -35,7 +39,10 @@ class GameScreen(Screen):
             self._dict_images[self._liste_cartes_en_jeu[0]]= photo
 
             for image in self._liste_cartes_en_jeu[1:]:
-                photo = ImageTk.PhotoImage(file= "D:\Atom_workspace\Python\Puissance_4\images\{0}.png".format(image))
+                script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+                rel_path = "../images/{0}.png"
+                abs_file_path = os.path.join(script_dir, rel_path)
+                photo = ImageTk.PhotoImage(file= abs_file_path.format(image))
 
                 width = photo.width()
                 height = photo.height()
