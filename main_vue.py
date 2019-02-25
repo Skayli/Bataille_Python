@@ -27,12 +27,12 @@ print("---------------------------------")
 
 print("Liste des joueurs :")
 g.printListeJoueurs()
-
-j1.addCarte(Carte(CouleurCarte.CARREAU, ValeurCarte.ROI))
-j1.addCarte(Carte(CouleurCarte.COEUR, ValeurCarte.ROI))
-j1.addCarte(Carte(CouleurCarte.COEUR, ValeurCarte.DEUX))
-
-j2.addCarte(Carte(CouleurCarte.CARREAU, ValeurCarte.TROIS))
+# 
+# j1.addCarte(Carte(CouleurCarte.CARREAU, ValeurCarte.ROI))
+# j1.addCarte(Carte(CouleurCarte.COEUR, ValeurCarte.ROI))
+# j1.addCarte(Carte(CouleurCarte.COEUR, ValeurCarte.DEUX))
+#
+# j2.addCarte(Carte(CouleurCarte.CARREAU, ValeurCarte.TROIS))
 
 # Partie graphique
 
@@ -47,7 +47,7 @@ menuScreen = MenuScreen(cadre, 600, 600)
 cadre.getScreenManager().ajouterScreen(gameScreen.getType(), gameScreen)
 cadre.getScreenManager().ajouterScreen(menuScreen.getType(), menuScreen)
 
-cadre.getScreenManager().setScreenCourant(gameScreen.getType())
+cadre.getScreenManager().setScreenCourant(menuScreen.getType())
 
 controller = Controller(cadre, g)
 
