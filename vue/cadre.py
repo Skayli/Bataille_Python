@@ -9,7 +9,9 @@ class Cadre(Frame):
     Classe définissant la fenêtre principale du jeu
     """
     def __init__(self, master=None, width=800, height=600, background='magenta'):
-        master.geometry('{0}x{1}'.format(width, height))
+        self._root = master
+        self._root.geometry('{0}x{1}'.format(width, height))
+        self._root.configure(bg='blue')
         # master.configure(background=str(background))
         # self.configure(background=str(background))
         Frame.__init__(self, master)
@@ -31,3 +33,14 @@ class Cadre(Frame):
 
     def getScreenManager(self):
         return self._screenManager
+
+    def modifyScreen(self, screenName):
+        self._screenManager.getScreenCourant().getCanvas().place_forget()
+
+        self._screenManager.setScreenCourant(screenName)
+        # print(self._screenManager.getScreenCourant().getType())
+        self._screenManager.getScreenCourant().affiche()
+        # self._root.update()
+
+    def quitter(self):
+        self._root.destroy()
