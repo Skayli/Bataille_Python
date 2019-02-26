@@ -27,7 +27,7 @@ print("---------------------------------")
 
 print("Liste des joueurs :")
 g.printListeJoueurs()
-# 
+#
 # j1.addCarte(Carte(CouleurCarte.CARREAU, ValeurCarte.ROI))
 # j1.addCarte(Carte(CouleurCarte.COEUR, ValeurCarte.ROI))
 # j1.addCarte(Carte(CouleurCarte.COEUR, ValeurCarte.DEUX))
