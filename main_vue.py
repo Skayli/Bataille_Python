@@ -27,27 +27,27 @@ print("---------------------------------")
 
 print("Liste des joueurs :")
 g.printListeJoueurs()
-# 
-# j1.addCarte(Carte(CouleurCarte.CARREAU, ValeurCarte.ROI))
-# j1.addCarte(Carte(CouleurCarte.COEUR, ValeurCarte.ROI))
-# j1.addCarte(Carte(CouleurCarte.COEUR, ValeurCarte.DEUX))
-#
-# j2.addCarte(Carte(CouleurCarte.CARREAU, ValeurCarte.TROIS))
+
+j1.addCarte(Carte(CouleurCarte.CARREAU, ValeurCarte.ROI))
+j1.addCarte(Carte(CouleurCarte.COEUR, ValeurCarte.ROI))
+j1.addCarte(Carte(CouleurCarte.COEUR, ValeurCarte.DEUX))
+
+j2.addCarte(Carte(CouleurCarte.CARREAU, ValeurCarte.TROIS))
 
 # Partie graphique
 
 root = Tk()
 
-# screenManager = ScreenManagexr()
+# screenManager = ScreenManager()
 cadre = Cadre(root, 900, 900, 'yellow')
-# cadre = Cadre(screenManager, 80v0, 600)
+# cadre = Cadre(screenManager, 800, 600)
 
 gameScreen = GameScreen(cadre, 600, 600, 'green')
 menuScreen = MenuScreen(cadre, 600, 600)
 cadre.getScreenManager().ajouterScreen(gameScreen.getType(), gameScreen)
 cadre.getScreenManager().ajouterScreen(menuScreen.getType(), menuScreen)
 
-cadre.getScreenManager().setScreenCourant(menuScreen.getType())
+cadre.getScreenManager().setScreenCourant(gameScreen.getType())
 
 controller = Controller(cadre, g)
 
