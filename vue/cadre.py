@@ -1,6 +1,7 @@
 # On importe Tkinter
 # import tkinter as tk
 from tkinter import *
+from tkinter import font  as tkfont # python 3
 from PIL import Image,ImageTk
 from vue.menuScreen import MenuScreen
 from vue.gameScreen import GameScreen
@@ -11,6 +12,11 @@ class Cadre(Tk):
     """
     def __init__(self, *args, **kwargs):
         Tk.__init__(self, *args, **kwargs)
+
+        self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
+
+        self.title("Jeu de la bataille")
+        self.geometry("800x600")
 
         container = Frame(self)
         container.pack(side="top", fill="both", expand=True)

@@ -15,7 +15,10 @@ class GameScreen(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
         self.controller = controller
-        button1 = Button(self, text="Go to menu", command=lambda: controller.show_frame("MenuScreen"))
+        label = Label(self, text="Page du game", font=controller.title_font)
+        label.pack(side="top", fill="x", pady=10)
+
+        button1 = Button(self, text="Voir la page menuScreen", command=lambda: controller.show_frame("MenuScreen"))
         button1.pack()
         # self._liste_cartes_en_jeu = ["as_coeur", "as_pique", "as_trefle", "as_carreau"]
         # self._dict_images = {}

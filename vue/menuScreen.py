@@ -48,12 +48,8 @@ class MenuScreen(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
         self.controller = controller
-        label = Label(self, text="This is the start page", font=controller.title_font)
+        label = Label(self, text="Page du menu", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
 
-        button1 = Button(self, text="Go to Page One",
-                            command=lambda: controller.show_frame("PageOne"))
-        button2 = Button(self, text="Go to Page Two",
-                            command=lambda: controller.show_frame("PageTwo"))
+        button1 = Button(self, text="Voir la page 'gameScreen'", command=lambda: controller.show_frame("GameScreen"))
         button1.pack()
-        button2.pack()
