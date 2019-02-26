@@ -51,5 +51,21 @@ class MenuScreen(Frame):
         label = Label(self, text="Page du menu", font=mainFrame.title_font)
         label.pack(side="top", fill="x", pady=10)
 
-        button1 = Button(self, text="Voir la page 'gameScreen'", command=lambda: mainFrame.show_frame("GameScreen"))
-        button1.pack()
+        self._boutonJouer = Button(self, text='Jouer', command= lambda: mainFrame.show_frame("GameScreen"))
+        self._boutonQuitter = Button(self, text='Quitter', command= lambda: self.actionQuitter())
+
+        self._boutonJouer.place(relx=0.25, rely=0.90, anchor=SW)
+        self._boutonQuitter.place(relx=0.75, rely=0.90, anchor=SE)
+
+        helv36 = Font(family='Helvetica', size=20, weight='bold')
+        self._boutonJouer.configure(font = helv36)
+        self._boutonQuitter.configure(font = helv36)
+
+    def getBoutonJouer(self):
+        return self._boutonJouer
+
+    def getBoutonQuitter(self):
+        return self._boutonQuitter
+
+    def actionQuitter(self):
+        self.mainFrame.quitter()

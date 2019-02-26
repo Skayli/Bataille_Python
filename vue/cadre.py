@@ -40,3 +40,6 @@ class Cadre(Tk):
         '''Show a frame for the given page name'''
         frame = self.frames[page_name]
         frame.tkraise()
+
+    def quitter(self):
+        self.destroy()

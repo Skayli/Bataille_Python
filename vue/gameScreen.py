@@ -20,9 +20,21 @@ class GameScreen(Frame):
 
         button1 = Button(self, text="Voir la page menuScreen", command=lambda: mainFrame.show_frame("MenuScreen"))
         button1.pack()
-        # self._liste_cartes_en_jeu = ["as_coeur", "as_pique", "as_trefle", "as_carreau"]
-        # self._dict_images = {}
-        # self.update_dictionnaire_images()
+
+        self._canvas = Canvas(self, width=600, height=600, bg='green')
+        self._canvas.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+        self._liste_cartes_en_jeu = ["as_coeur", "as_pique", "as_trefle", "as_carreau"]
+        self._dict_images = {}
+
+        self.update_dictionnaire_images()
+
+        self.labels = [Label(self._canvas, text=''), Label(self._canvas, text=''), Label(self._canvas, text=''), Label(self._canvas, text='')]
+
+        self.labels[0].place(relx=0.5, rely=0.98, anchor=S)
+        self.labels[1].place(relx=0.5, rely=0.02, anchor=N)
+        self.labels[2].place(relx=0.95, rely=0.5, anchor=E)
+        self.labels[3].place(relx=0.05, rely=0.5, anchor=W)
 
     def update_dictionnaire_images(self):
         # On vide le dictionnaire
@@ -42,9 +54,10 @@ class GameScreen(Frame):
             print(x, ' ', y)
             print('CANVAS DIMENSION ', self._canvas.cget('width'), self._canvas.cget('height'))
             item = self._canvas.create_image(x,y,image=photo)
-            self._canvas.tag_bind(item, '<B1-Motion>', lambda event: self.moveCard(event))
             self._dict_images[self._liste_cartes_en_jeu[0]]= photo
-
+            self._canvas.tag_bind(item, '<Button-1>', self.selectionnerCarte)
+            self._canvas.bind('<B1-Motion>', self.moveCard)
+            self._canvas.bind('<ButtonRelease-1>', self.relacherCarte)
 
             for image in self._liste_cartes_en_jeu[1:]:
                 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
@@ -57,31 +70,32 @@ class GameScreen(Frame):
                 x = x + width + (width/2)
 
                 item = self._canvas.create_image(x,y,image=photo)
-                self._canvas.tag_bind(item,'<B1-Motion>', self.moveCard)
                 self._dict_images[image]= photo
+                self._canvas.tag_bind(item, '<Button-1>', self.selectionnerCarte)
+
+    def selectionnerCarte(self, event):
+        print('entre dans selection carte')
+        self.carte = self._canvas.find_closest(event.x, event.y)
 
     def moveCard(self, event):
-        print (1)
-        item = self._canvas.find_closest(event.x, event.y)
-        self._canvas.coords(item, event.x, event.y)
+        print('move carte')
+        if self.carte is not None:
+            self._canvas.coords(self.carte, event.x, event.y)
 
-    # def update_dictionnaire_images_v2(self):
-    #     # On vide le dictionnaire
-    #     self._dict_images.clear()
-    #
-    #     if len(self._liste_cartes_en_jeu) > 0:
-    #         x = 138
-    #         y = 300
-    #         for image in self._liste_cartes_en_jeu:
-    #             photo = ImageTk.PhotoImage(file= "D:\Atom_workspace\Python\Puissance_4\images\{0}.png".format(image))
-    #
-    #             width = photo.width()
-    #             height = photo.height()
-    #             x = x + width + (width/2)
-    #
-    #             print(x, ' ', y)
-    #
-    #             item = self._canvas.create_image(x,y,image=photo)
-    #
-    #             self._dict_images[image]= photo
-    #         print(self._dict_images)
+    def relacherCarte(self, event):
+        print('carte relachee')
+        self.carte = None
+
+    def getCanvas(self):
+        return self._canvas
+
+    def afficherPseudoJoueurs(self, pseudo):
+        for label in self.labels:
+            if label['text'] == '':
+                label['text'] = str(pseudo)
+                break
+
+    def cacherElementInutiles(self):
+        for label in self.labels:
+            if label['text'] == '':
+                label.place_forget()
