@@ -11,6 +11,7 @@ from vue.menuScreen import *
 from controller.controller import *
 from vue.utilitaire import *
 
+<<<<<<< HEAD
 j1 = Joueur("j1")
 j2 = Joueur("j2")
 
@@ -36,20 +37,9 @@ g.printListeJoueurs()
 
 # Partie graphique
 
+=======
+>>>>>>> 29902604a9c76445257d292ad5d6a2117e0a1f65
 root = Tk()
-
-# screenManager = ScreenManagexr()
-cadre = Cadre(root, 900, 900, 'yellow')
-# cadre = Cadre(screenManager, 80v0, 600)
-
-gameScreen = GameScreen(cadre, 600, 600, 'green')
-menuScreen = MenuScreen(cadre, 600, 600)
-cadre.getScreenManager().ajouterScreen(gameScreen.getType(), gameScreen)
-cadre.getScreenManager().ajouterScreen(menuScreen.getType(), menuScreen)
-
-cadre.getScreenManager().setScreenCourant(menuScreen.getType())
-
-controller = Controller(cadre, g)
-
-cadre.affiche()
-cadre.mainloop()
+root.withdraw()
+app = Controller(root);
+root.mainloop()

@@ -55,6 +55,7 @@ class GameScreen(Screen):
                 self._dict_images[image]= photo
 
     def moveCard(self, event):
+        print (1)
         item = self._canvas.find_closest(event.x, event.y)
         self._canvas.coords(item, event.x, event.y)
 
