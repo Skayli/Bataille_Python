@@ -2,6 +2,7 @@ from tkinter import *
 from vue.screenManager import *
 from vue.cadre import *
 from model.game import *
+from model.joueur import *
 
 class Controller:
     """
@@ -12,3 +13,16 @@ class Controller:
     def __init__(self, window):
         self.window = window
         self.game = Game()
+        j1 = Joueur('Maitre Kacem')
+        j2 = Joueur('Etudiant CM2')
+        j3 = Joueur('Colson')
+        self.game.addJoueur(j1)
+        self.game.addJoueur(j2)
+        self.game.addJoueur(j3)
+
+        self.game.distribuerCartes()
+
+        self.window.frames['GameScreen'].afficherPseudoJoueurs(j1.getPseudo())
+        self.window.frames['GameScreen'].afficherPseudoJoueurs(j2.getPseudo())
+        self.window.frames['GameScreen'].afficherPseudoJoueurs(j3.getPseudo())
+        self.window.frames['GameScreen'].cacherElementInutiles()
