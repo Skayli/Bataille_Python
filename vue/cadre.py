@@ -26,7 +26,7 @@ class Cadre(Tk):
         self.frames = {}
         for F in (MenuScreen, GameScreen):
             page_name = F.__name__
-            frame = F(parent=container, controller=self)
+            frame = F(parent=container, mainFrame=self)
             self.frames[page_name] = frame
 
             # put all of the pages in the same location;

@@ -12,13 +12,13 @@ class GameScreen(Frame):
     Définit le tapis de jeu composé des cartes jouées
     """
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, mainFrame):
         Frame.__init__(self, parent)
-        self.controller = controller
-        label = Label(self, text="Page du game", font=controller.title_font)
+        self.mainFrame = mainFrame
+        label = Label(self, text="Page du game", font=mainFrame.title_font)
         label.pack(side="top", fill="x", pady=10)
 
-        button1 = Button(self, text="Voir la page menuScreen", command=lambda: controller.show_frame("MenuScreen"))
+        button1 = Button(self, text="Voir la page menuScreen", command=lambda: mainFrame.show_frame("MenuScreen"))
         button1.pack()
         # self._liste_cartes_en_jeu = ["as_coeur", "as_pique", "as_trefle", "as_carreau"]
         # self._dict_images = {}

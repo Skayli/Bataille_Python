@@ -45,11 +45,11 @@ class MenuScreen(Frame):
     Classe MenuScreen héritant de Screen
     Définit le menu principal de l'application
     """
-    def __init__(self, parent, controller):
+    def __init__(self, parent, mainFrame):
         Frame.__init__(self, parent)
-        self.controller = controller
-        label = Label(self, text="Page du menu", font=controller.title_font)
+        self.mainFrame = mainFrame
+        label = Label(self, text="Page du menu", font=mainFrame.title_font)
         label.pack(side="top", fill="x", pady=10)
 
-        button1 = Button(self, text="Voir la page 'gameScreen'", command=lambda: controller.show_frame("GameScreen"))
+        button1 = Button(self, text="Voir la page 'gameScreen'", command=lambda: mainFrame.show_frame("GameScreen"))
         button1.pack()

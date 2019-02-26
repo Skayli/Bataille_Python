@@ -9,6 +9,6 @@ class Controller:
     Possède des méthodes statiques pour les callbacks
     """
 
-    def __init__(self, root):
-        self._cadre = Cadre(root, 900, 900, 'yellow')
-        self._game = Game()
+    def __init__(self, window):
+        self.window = window
+        self.game = Game()
