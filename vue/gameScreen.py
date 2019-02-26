@@ -6,17 +6,20 @@ from vue.utilitaire import *
 from vue.screen import *
 import os
 
-class GameScreen(Screen):
+class GameScreen(Frame):
     """
     Classe GameScreen héritant de Screen
     Définit le tapis de jeu composé des cartes jouées
     """
 
-    def __init__(self, root, width=600, height=600, bg='green'):
-        Screen.__init__(self, root, width, height, bg)
-        self._liste_cartes_en_jeu = ["as_coeur", "as_pique", "as_trefle", "as_carreau"]
-        self._dict_images = {}
-        self.update_dictionnaire_images()
+    def __init__(self, parent, controller):
+        Frame.__init__(self, parent)
+        self.controller = controller
+        button1 = Button(self, text="Go to menu", command=lambda: controller.show_frame("MenuScreen"))
+        button1.pack()
+        # self._liste_cartes_en_jeu = ["as_coeur", "as_pique", "as_trefle", "as_carreau"]
+        # self._dict_images = {}
+        # self.update_dictionnaire_images()
 
     def update_dictionnaire_images(self):
         # On vide le dictionnaire
