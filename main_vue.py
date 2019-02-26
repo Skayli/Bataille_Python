@@ -11,7 +11,5 @@ from vue.menuScreen import *
 from controller.controller import *
 from vue.utilitaire import *
 
-root = Tk()
-root.withdraw()
-app = Controller(root);
-root.mainloop()
+app = Cadre()
+app.mainloop()
