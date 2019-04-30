@@ -5,6 +5,7 @@ from tkinter import font  as tkfont # python 3
 from PIL import Image,ImageTk
 from vue.menuScreen import MenuScreen
 from vue.gameScreen import GameScreen
+from vue.lobbyScreen import LobbyScreen
 
 class Cadre(Tk):
     """
@@ -24,7 +25,7 @@ class Cadre(Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (MenuScreen, GameScreen):
+        for F in (MenuScreen, GameScreen, LobbyScreen):
             page_name = F.__name__
             frame = F(parent=container, mainFrame=self)
             self.frames[page_name] = frame

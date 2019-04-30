@@ -33,6 +33,10 @@ class Game:
 
         return False
 
+    # Retourne le nombre de joueurs
+    def getNBJoueurs(self):
+        return len(self.listeJoueurs)
+
     # Initialise un paquet de carte, le mélange et le distribue aux listeJoueurs
     # de telle sorte que chacun possède le même nombre de cartes
     def distribuerCartes(self):

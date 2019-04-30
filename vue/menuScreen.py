@@ -51,7 +51,7 @@ class MenuScreen(Frame):
         label = Label(self, text="Page du menu", font=mainFrame.title_font)
         label.pack(side="top", fill="x", pady=10)
 
-        self._boutonJouer = Button(self, text='Jouer', command= lambda: mainFrame.show_frame("GameScreen"))
+        self._boutonJouer = Button(self, text='Commencer', command= lambda: mainFrame.show_frame("LobbyScreen"))
         self._boutonQuitter = Button(self, text='Quitter', command= lambda: self.actionQuitter())
 
         self._boutonJouer.place(relx=0.25, rely=0.90, anchor=SW)

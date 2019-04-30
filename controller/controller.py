@@ -13,10 +13,6 @@ class Controller:
     def __init__(self, window):
         self.window = window
         self.game = Game()
-<<<<<<< HEAD
-
-     
-=======
         j1 = Joueur('Maitre Kacem')
         j2 = Joueur('Etudiant CM2')
         j3 = Joueur('Colson')
@@ -26,8 +22,11 @@ class Controller:
 
         self.game.distribuerCartes()
 
-        self.window.frames['GameScreen'].afficherPseudoJoueurs(j1.getPseudo())
-        self.window.frames['GameScreen'].afficherPseudoJoueurs(j2.getPseudo())
-        self.window.frames['GameScreen'].afficherPseudoJoueurs(j3.getPseudo())
-        self.window.frames['GameScreen'].cacherElementInutiles()
->>>>>>> ceb53396752fbc7b09f88f8dd1cca9435ad05aab
+        gameScreen = self.window.frames['GameScreen']
+        gameScreen.afficherPseudoJoueurs(j1.getPseudo())
+        gameScreen.afficherPseudoJoueurs(j2.getPseudo())
+        gameScreen.afficherPseudoJoueurs(j3.getPseudo())
+        gameScreen.cacherElementInutiles()
+
+        print(self.game.getNBJoueurs())
+        gameScreen.afficheCartes(self.game.getNBJoueurs())

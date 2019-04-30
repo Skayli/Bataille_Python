@@ -18,16 +18,18 @@ class GameScreen(Frame):
         label = Label(self, text="Page du game", font=mainFrame.title_font)
         label.pack(side="top", fill="x", pady=10)
 
-        button1 = Button(self, text="Voir la page menuScreen", command=lambda: mainFrame.show_frame("MenuScreen"))
+        button1 = Button(self, text="Retour au menu", command=lambda: mainFrame.show_frame("MenuScreen"))
         button1.pack()
 
         self._canvas = Canvas(self, width=600, height=600, bg='green')
-        self._canvas.place(relx=0.5, rely=0.5, anchor=CENTER)
+        # self._canvas.place(relx=0.5, rely=0.5, anchor=CENTER)
+        self._canvas.pack(side="bottom", fill="both")
 
-        self._liste_cartes_en_jeu = ["as_coeur", "as_pique", "as_trefle", "as_carreau"]
+        # self._liste_cartes_en_jeu = ["as_coeur", "as_pique", "as_trefle", "as_carreau"]
+        self._liste_cartes_en_jeu = ["face_cachee"]
         self._dict_images = {}
 
-        self.update_dictionnaire_images()
+        # self.update_dictionnaire_images()
 
         self.labels = [Label(self._canvas, text=''), Label(self._canvas, text=''), Label(self._canvas, text=''), Label(self._canvas, text='')]
 
@@ -72,6 +74,18 @@ class GameScreen(Frame):
                 item = self._canvas.create_image(x,y,image=photo)
                 self._dict_images[image]= photo
                 self._canvas.tag_bind(item, '<Button-1>', self.selectionnerCarte)
+
+    def afficheCartes(self, nbJoueurs):
+        for i in range(0, (nbJoueurs-1)):
+            script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+            rel_path = "../images/face_cachee.png"
+            abs_file_path = os.path.join(script_dir, rel_path)
+
+            photo = ImageTk.PhotoImage(file= abs_file_path)
+            item = self._canvas.create_image(0, 0, anchor=CENTER ,image=photo)
+
+            self._dict_images[i]= photo
+            self._canvas.tag_bind(item, '<Button-1>', self.selectionnerCarte)
 
     def selectionnerCarte(self, event):
         print('entre dans selection carte')
