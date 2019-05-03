@@ -36,3 +36,17 @@ class Carte:
     # Surcharge de l'opérateur "=="
     def isMemeValeur(self, other):
         return self.valeur == other.valeur
+
+    # Getter pour la valeur de la carte
+    def getValeur(self):
+        return self.valeur
+
+    # Getter pour la couleur de la carte
+    def getCouleur(self):
+        return self.couleur
+
+    def getNomCarteFormatFichier(self):
+        if (self.valeur.value > 10):
+            return (str(self.valeur.name).lower() + '_' + str(self.couleur.name).lower())
+        else:
+            return (str(self.valeur.value).lower() + '_' + str(self.couleur.name).lower())

@@ -37,6 +37,10 @@ class Game:
     def getNBJoueurs(self):
         return len(self.listeJoueurs)
 
+    # Retourne le joueur en fonction d'un indice
+    def getJoueur(self, index):
+        return self.listeJoueurs[index]
+
     # Initialise un paquet de carte, le mélange et le distribue aux listeJoueurs
     # de telle sorte que chacun possède le même nombre de cartes
     def distribuerCartes(self):

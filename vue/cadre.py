@@ -17,17 +17,17 @@ class Cadre(Tk):
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
 
         self.title("Jeu de la bataille")
-        self.geometry("800x600")
+        self.geometry("1280x720")
 
-        container = Frame(self)
-        container.pack(side="top", fill="both", expand=True)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
+        self.container = Frame(self)
+        self.container.pack(side="top", fill="both", expand=True)
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
         for F in (MenuScreen, GameScreen, LobbyScreen):
             page_name = F.__name__
-            frame = F(parent=container, mainFrame=self)
+            frame = F(parent=self.container, mainFrame=self)
             self.frames[page_name] = frame
 
             # put all of the pages in the same location;
@@ -36,6 +36,15 @@ class Cadre(Tk):
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame("MenuScreen")
+
+    def reset_screen(self, nom_screen):
+        for key in self.frames.keys():
+            if key == nom_screen:
+                frame = self.frames[nom_screen]
+                pageType = frame.__class__
+                frame = pageType(parent=self.container, mainFrame=self)
+                self.frames[nom_screen] = frame
+                frame.grid(row=0, column=0, sticky="nsew")
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''

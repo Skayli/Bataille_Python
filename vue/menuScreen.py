@@ -51,18 +51,27 @@ class MenuScreen(Frame):
         label = Label(self, text="Page du menu", font=mainFrame.title_font)
         label.pack(side="top", fill="x", pady=10)
 
-        self._boutonJouer = Button(self, text='Commencer', command= lambda: mainFrame.show_frame("LobbyScreen"))
+        self._boutonJouerSolo = Button(self, text='Commencer une Partie Hors-Ligne', command= lambda: mainFrame.show_frame("LobbyScreen"))
+        self._boutonJouerMulti = Button(self, text='Commencer une Partie En ligne', command= lambda: mainFrame.show_frame("LobbyScreen"))
         self._boutonQuitter = Button(self, text='Quitter', command= lambda: self.actionQuitter())
 
-        self._boutonJouer.place(relx=0.25, rely=0.90, anchor=SW)
-        self._boutonQuitter.place(relx=0.75, rely=0.90, anchor=SE)
+        # self._boutonJouerSolo.place(relx=0.25, rely=0.5, anchor=S)
+        # self._boutonJouerMulti.place(relx=0.5, rely=0.5, anchor=S)
+        # self._boutonQuitter.place(relx=0.75, rely=0.90, anchor=S)
+        self._boutonJouerSolo.pack(pady="50")
+        self._boutonJouerMulti.pack(pady="50")
+        self._boutonQuitter.pack(pady="50")
 
         helv36 = Font(family='Helvetica', size=20, weight='bold')
-        self._boutonJouer.configure(font = helv36)
+        self._boutonJouerSolo.configure(font = helv36)
+        self._boutonJouerMulti.configure(font = helv36)
         self._boutonQuitter.configure(font = helv36)
 
-    def getBoutonJouer(self):
-        return self._boutonJouer
+    def getBoutonJouerSolo(self):
+        return self._boutonJouerSolo
+
+    def getBoutonJouerMulti(self):
+        return self._boutonJouerMulti
 
     def getBoutonQuitter(self):
         return self._boutonQuitter
