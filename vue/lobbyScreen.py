@@ -33,7 +33,7 @@ class LobbyScreen(Frame):
         # self._boutonValiderPseudo = Button(self, text='Valider')
         # self._boutonJouer = Button(self, text='Jouer', command= lambda: mainFrame.show_frame("GameScreen"))
         self._boutonJouer = Button(self, text='Jouer')
-        self._boutonRetour = Button(self, text='Retour')
+        self._boutonRetour = Button(self, text='Retour', command= lambda: self.mainFrame.show_frame("GameModeScreen"))
         # Polices pour les composants
         helv36 = Font(family='Helvetica', size=20, weight='bold')
         self._boutonJouer.configure(font = helv36)

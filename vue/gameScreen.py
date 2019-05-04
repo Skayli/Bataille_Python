@@ -20,6 +20,8 @@ class GameScreen(Frame):
         label.grid(row=0, column=1)
 
         self._canvas = Canvas(self, width=800, height=600, bg='green')
+        # Gestion évènements
+        self._canvas.bind('<B1-Motion>', self.moveCard)
         # Dessin du cadre dans lequel faudra placer les cartes
         self._tag_zone_jeu = 'zone_jeu'
         self._x1, self._y1, self._x2, self._y2 = 150, 150, (int(self._canvas.cget('width'))-150), (int(self._canvas.cget('height'))-150)
@@ -32,7 +34,7 @@ class GameScreen(Frame):
         # self._liste_cartes_en_jeu = ["as_coeur", "as_pique", "as_trefle", "as_carreau"]
         self._liste_cartes_en_jeu = ["face_cachee"]
         self._dict_images = {}
-        self._carteFC = None
+        self._cartePile = None
         self._index_cartes_sur_tapis = 0
         # self.update_dictionnaire_images()
 
@@ -118,7 +120,7 @@ class GameScreen(Frame):
             self._dict_images[i]= photo
             self._canvas.tag_bind(item, '<Button-1>', self.selectionnerCarte)
 
-    def afficherCarteFC(self):
+    def afficherCartePile(self):
         # On vide le dictionnaire
         self._dict_images.clear()
         # On cherche l'image de la carte
@@ -141,37 +143,37 @@ class GameScreen(Frame):
 
     def placerCarteJouee(self, nomFichierCarte):
         photo = ImageTk.PhotoImage(file= nomFichierCarte)
-        coordsCarte = self._canvas.coords(self._carteFC)
+        coordsCarte = self._canvas.coords(self._cartePile)
         x, y = coordsCarte[0], coordsCarte[1]
         item = self._canvas.create_image(x, y, image=photo)
         self._dict_images[self._index_cartes_sur_tapis]= photo
         self._index_cartes_sur_tapis += 1
         # Reset la position de la carte FC
-        self.resetPositionCarteFC()
+        self.resetPositionCartePile()
 
-    def resetPositionCarteFC(self):
-        self._canvas.coords(self._carteFC, self._x_BaseCarteFC, self._y_BaseCarteFC)
-        self._canvas.tag_raise(self._carteFC)
+    def resetPositionCartePile(self):
+        self._canvas.coords(self._cartePile, self._x_BaseCarteFC, self._y_BaseCarteFC)
+        self._canvas.tag_raise(self._cartePile)
 
     def selectionnerCarte(self, event):
         print('entre dans selection carte')
-        self._carteFC = self._canvas.find_closest(event.x, event.y)[0] # Le 0 c'est car on prend la 1ere
+        self._cartePile = self._canvas.find_closest(event.x, event.y)[0] # Le 0 c'est car on prend la 1ere
 
     def moveCard(self, event):
-        if self._carteFC is not None:
+        if self._cartePile is not None:
             print('move carte')
-            self._canvas.coords(self._carteFC, event.x, event.y)
+            self._canvas.coords(self._cartePile, event.x, event.y)
 
     def relacherCarte(self, event):
-        if self._carteFC is not None:
+        if self._cartePile is not None:
             print('carte relachee')
             enclosedObjects = self._canvas.find_enclosed(self._x1, self._y1, self._x2, self._y2)
             print(enclosedObjects)
             if len(enclosedObjects) > 0:
                 for item in enclosedObjects:
-                    if (item is self._carteFC):
+                    if (item is self._cartePile):
                         None
-            self._carteFC = None
+            self._cartePile = None
 
     def getEnclosedObjectsZoneJeu(self):
         return self._canvas.find_enclosed(self._x1, self._y1, self._x2, self._y2)
@@ -179,11 +181,11 @@ class GameScreen(Frame):
     def getCanvas(self):
         return self._canvas
 
-    def getCarteFC(self):
-        return self._carteFC
+    def getCartePile(self):
+        return self._cartePile
 
-    def setCarteFC(self, value):
-        self._carteFC = value
+    def setCartePile(self, value):
+        self._cartePile = value
 
     def getIndexCartesSurTapis(self):
         return self._index_cartes_sur_tapis
