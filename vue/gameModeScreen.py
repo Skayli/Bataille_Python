@@ -50,8 +50,8 @@ class GameModeScreen(Frame):
         label = Label(self, text="Sélection du mode de jeu", font=mainFrame.title_font)
         label.pack(side="top", fill="x", pady=10)
 
-        self._boutonHeberger = Button(self, text='Héberger une partie', command= lambda: mainFrame.show_frame("LobbyScreen"))
-        self._boutonRejoindre = Button(self, text='Rejoindre une partie', command= lambda: mainFrame.show_frame("LobbyScreen"))
+        self._boutonHeberger = Button(self, text='Héberger une partie')
+        self._boutonRejoindre = Button(self, text='Rejoindre une partie')
         self._boutonQuitter = Button(self, text='Quitter', command= lambda: self.mainFrame.quitter())
 
         # self._boutonHeberger.place(relx=0.25, rely=0.5, anchor=S)

@@ -26,5 +26,4 @@ class Joueur:
         self.listeCartes = []
 
     def addCarte(self, carte):
-        if(carte not in self.listeCartes):
-            self.listeCartes.append(carte)
+        self.listeCartes.append(carte)

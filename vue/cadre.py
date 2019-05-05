@@ -6,17 +6,24 @@ from PIL import Image,ImageTk
 from vue.menuScreen import *
 from vue.pseudoScreen import *
 from vue.gameModeScreen import *
-from vue.lobbyScreen import *
+from vue.hebergerScreen import *
+from vue.rejoindreScreen import *
 from vue.gameScreen import *
+import queue as Queue
 
 class Cadre(Tk):
     """
     Classe définissant la fenêtre principale du jeu
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self, queue, *args, **kwargs):
         Tk.__init__(self, *args, **kwargs)
-
+        # La Queue pour les refresh de la GUI
+        self._queue = queue
+        # Adapteur_vue
+        self._adapteur_vue = None
+        # Composants graphiques
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
+        self._helv20 = Font(family='Helvetica', size=20, weight='bold')
 
         self.title("Jeu de la bataille")
         self.geometry("1280x720")
@@ -27,7 +34,7 @@ class Cadre(Tk):
         self.container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (MenuScreen, PseudoScreen, GameModeScreen, LobbyScreen, GameScreen):
+        for F in (MenuScreen, PseudoScreen, GameModeScreen, HebergerScreen, RejoindreScreen, GameScreen):
             page_name = F.__name__
             frame = F(parent=self.container, mainFrame=self)
             self.frames[page_name] = frame
@@ -55,3 +62,24 @@ class Cadre(Tk):
 
     def quitter(self):
         self.destroy()
+
+    def setAdapteurVue(self, adapteur_vue):
+        self._adapteur_vue = adapteur_vue
+        adapteur_vue.setCadre(self)
+
+    def processIncoming(self):
+        """
+        Handle all the messages currently in the queue (if any).
+        """
+        while self._queue.qsize():
+            try:
+                msg = self._queue.get(0)
+                # Check contents of message and do what it says
+                # As a test, we simply print it
+                if (self._adapteur_vue.isCommand(msg) == True):
+                    self._adapteur_vue.analyseCommand(msg)
+                print(msg)
+            except Queue.Empty:
+                pass
+    def addQueue(self, request):
+        self._queue.put(request)

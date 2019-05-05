@@ -19,7 +19,7 @@ class MenuScreen(Frame):
         label.pack(side="top", fill="x", pady=10)
         # Création boutons
         self._boutonCommencer = Button(self, text='Commencer', command= lambda: mainFrame.show_frame("PseudoScreen"))
-        self._boutonQuitter = Button(self, text='Quitter', command= lambda: self.actionQuitter())
+        self._boutonQuitter = Button(self, text='Quitter', command= lambda: self.mainFrame.quitter())
 
         self._boutonCommencer.pack(pady="50")
         self._boutonQuitter.pack(pady="50")
@@ -33,6 +33,3 @@ class MenuScreen(Frame):
 
     def getBoutonQuitter(self):
         return self._boutonQuitter
-
-    def actionQuitter(self):
-        self.mainFrame.quitter()

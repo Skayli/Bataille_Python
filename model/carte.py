@@ -1,3 +1,6 @@
+from model.couleurCarte import *
+from model.valeurCarte import *
+
 class Carte:
 
     def __init__(self, couleur, valeur):
@@ -24,6 +27,10 @@ class Carte:
             None
 
     plusHauteValeur = staticmethod(plusHauteValeur)
+
+    @staticmethod
+    def createCardFromStrings(couleur, valeur):
+        return Carte(CouleurCarte[couleur], ValeurCarte[valeur])
 
     # Surcharge de l'opérateur ">"
     def __gt__(self, other):

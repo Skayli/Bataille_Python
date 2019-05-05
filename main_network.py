@@ -14,13 +14,11 @@ from model.valeurCarte import *
 from model.carte import *
 from model.joueur import *
 from model.game import *
+from model.adapteur_model import *
 
 ivylogger.setLevel(logging.WARN)
 
-IVYAPPNAME = "" # Nom du joueur local
-readymsg = None
-isFirst = False # Indique si c'est l'initiateur de la partie
-
+# Ivy functions -------------------------------------------------------------------
 def info(fmt, *arg):
         print(fmt % arg)
 
@@ -29,12 +27,13 @@ def on_connection_change(agent, event):
         info('Ivy application %r has disconnected', agent)
     else:
         info("Connexion de %r", agent)
-        if isFirst:
-            newPlayerName = IvyGetApplicationName(agent)
-            joueur = Joueur(newPlayerName)
-            game.addJoueur(joueur)
-            print("AJout de " + newPlayerName + " à la partie")
+        count = len(IvyGetApplicationList())
+        print("Count : " + str(count))
+        if count > 3:
+            IvySendDirectMsg(agent, 0, "La partie ne peut plus accueillir de nouveaux joueurs")
+            IvySendDieMsg(agent)
 
+    print("---------------------------------------------------------------")
 
 def on_die(agent, _id):
     info('Received the order to die from %r with id = %d', agent, _id)
@@ -44,33 +43,62 @@ def on_die(agent, _id):
     os.kill(os.getpid(), signal.SIGINT)
 
 def on_msg(agent, *arg):
-    info(arg[0])
-    # print("From ", agent, " : ", arg[0])
-
+    if(adapteur_model.isCommand(arg[0])):
+        adapteur_model.analyseCommand(arg[0])
+    else:
+        print(arg[0])
 
 def on_direct_msg(agent, num_id, msg):
-    info('%r sent a direct message, id=%s, message=%s', agent, num_id, msg)
+    print("Message de la part de " + IvygetApplcationName(agent) + " : " + msg)
 
-IVYAPPNAME = input("Choisissez votre nom : ")
+# ------------------------------------------------------------------- Ivy functions
+IVYAPPNAME = input("Choisissez votre nom : ") #Nom du joueur
+readymsg = None
+isHost = False
+game = Game(IVYAPPNAME)
+adapteur_model = Adapteur_model()
+game.setAdapteurModel(adapteur_model)
+
+
+while True:
+    host = input("Voulez-vous héberger ou rejoindre une partie ? ")
+    if host == "h" or host == "r":
+        break
+
+if host == "h":
+    ivy_bus = "192.168.1.255"
+    isHost = True
+else:
+    ivy_bus =  "192.168.1.255"#input("Saissisez l'adresse IP de l'hote de la partie : ")
+
+ivy_bus = ivy_bus+":2010"
 
 IvyInit(IVYAPPNAME, readymsg, 0, on_connection_change, on_die)
-IvyStart("127.255.255.255:2010")
+IvyStart(ivy_bus)
 IvyBindMsg(on_msg, "(.*)")
-
-time.sleep(0.5)
-info('Go ahead! (type .help for help on commands)')
-count = len(IvyGetApplicationList())
-print(count)
-info("Nombre d'autres utilisateurs connectés : " + str(count))
-
-if count == 0:
-    isFirst = True
-    joueur = Joueur(IVYAPPNAME)
-    game = Game()
-    game.addJoueur(joueur)
-
+IvyBindDirectMsg(on_direct_msg)
 
 print("---------------------------------------------------------------")
+
+time.sleep(0.5)
+count = len(IvyGetApplicationList())
+info("Nombre d'autres utilisateurs connectés : " + str(count))
+print("---------------------------------------------------------------")
+
 while 1:
     msg = input('')
-    IvySendMsg(IVYAPPNAME + " : " + msg)
+
+    if msg == ".lancer":
+        if isHost:
+            game.initialiser()
+    elif msg == ".liste":
+        print("Liste des joueurs de la partie :")
+        game.printListeJoueurs()
+    elif msg == ".quit":
+        IvyStop()
+        break
+    elif msg== ".carte":
+        print("Prochaine carte à jouer de J1 : " + str(game.getPlayerByName("j1").getCarteAJouer()))
+        print("Prochaine carte à jouer de J2 : " + str(game.getPlayerByName("j2").getCarteAJouer()))
+    else:
+        IvySendMsg(IVYAPPNAME + " : " + msg)
