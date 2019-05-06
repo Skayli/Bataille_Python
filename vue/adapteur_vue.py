@@ -25,6 +25,19 @@ class Adapteur_vue:
     def prepareCommand(self, command):
         self._cadre.addQueue(command)
 
+    def notifyCurrentPlayerPlayed(self, infosCartePosee):
+        cartePosee = infosCartePosee.split(",")
+        fileName = cartePosee[0]
+        name = cartePosee[1]
+        posX = cartePosee[2]
+        posY = cartePosee[3]
+        gameScreen = self._cadre.frames['GameScreen']
+        gameScreen.showCarte(fileName, name, posX, posY)
+        IvySendMsg("CMDVIEW | cartePosee | {0}".format(infosCartePosee))
+
+    def askToHostToNotifyCurrentPlayerPlayed(self, infosCartePosee):
+        IvySendMsg("CMDVIEW | askToHostToNotifyCurrentPlayerPlayed | {0}".format(infosCartePosee))
+
     #Analyse une commande
     def analyseCommand(self, command):
         command = command.split("|")
@@ -40,6 +53,7 @@ class Adapteur_vue:
             hebergerScreen.updateLabelsJoueurs()
             # Mettre à jour les infos sur les joueurs humains et sur le bouton Jouer
             hebergerScreen.incrementerNombreJoueursHumains()
+            hebergerScreen.updateComboBoxBots()
             hebergerScreen.updateEtatBoutonJouer()
         elif actualCommand == "updateLabelHostRejoindreScreen":
             agentName = command[2].strip()
@@ -53,14 +67,34 @@ class Adapteur_vue:
                 m = re.search('Le joueur (.+?) a rejoint le lobby', labelJoueur.cget('text'))
                 if m:
                     found = m.group(1)
-                    newText = "{0} => {1} est prêt !".format(labelJoueur.cget('text'), found)
-                    labelJoueur.configure(text=newText)
-                    # Mettre à jour les infos sur les joueurs humains et sur le bouton Jouer
-                    hebergerScreen.incrementerNombreJoueursHumainsPrets()
-                    hebergerScreen.updateEtatBoutonJouer()
-                    # Ajouter le nom du Joueur
-                    hebergerScreen.ajouterNomJoueur(found)
-                    break
+                    if found == playerName:
+                        newText = "{0} => {1} est prêt !".format(labelJoueur.cget('text'), found)
+                        labelJoueur.configure(text=newText)
+                        # Mettre à jour les infos sur les joueurs humains et sur le bouton Jouer
+                        hebergerScreen.incrementerNombreJoueursHumainsPrets()
+                        hebergerScreen.updateEtatBoutonJouer()
+                        # Ajouter le nom du Joueur
+                        hebergerScreen.ajouterNomJoueur(found)
+                        break
+        elif actualCommand == "prepareLabelsGameScreen":
+            gameScreen = self._cadre.frames['GameScreen']
+            playerInfos = command[2].strip()
+            playerName = command[3].strip()
+            gameScreen.ajouterInfosJoueur(playerInfos, playerName)
+        elif actualCommand == "lancerPartie":
+            gameScreen = self._cadre.frames['GameScreen']
+            gameScreen.updateLayout()
+            self._cadre.show_frame("GameScreen")
+        elif actualCommand == "cartePosee":
+            cartePosee = command[2].strip().split(",")
+            fileName = cartePosee[0]
+            name = cartePosee[1]
+            posX = cartePosee[2]
+            posY = cartePosee[3]
+            gameScreen = self._cadre.frames['GameScreen']
+            gameScreen.showCarte(fileName, name, posX, posY)
+        elif actualCommand == "askToHostToNotifyCurrentPlayerPlayed":
+            self.notifyCurrentPlayerPlayed(command[2].strip())
 
     # Crée un joueur et l'ajoute
     def addPlayerToGame(self, playerName):

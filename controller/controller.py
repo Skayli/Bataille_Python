@@ -16,14 +16,13 @@ class Controller:
     def __init__(self, window):
         self._window = window
         self._game = None
-        self._adapteur_model = Adapteur_model()
         self._mainPlayer = None
         self._othersPlayers = []
         self._nbCartesJouees = 0
         self._pseudo = None
 
         self._ivyBus = None
-
+        # Gestion pour le GameScreen
         self.initGameScreen()
         # Gestion pour l'écran de saisie du pseudo
         self._window.frames['PseudoScreen'].getBoutonValider().config(command=self.validerPseudo)
@@ -39,49 +38,67 @@ class Controller:
         self._gameModeScreen.getBoutonHeberger().config(command=self.validerHeberger)
         self._gameModeScreen.getBoutonRejoindre().config(command=self.validerRejoindre)
 
+    # Initialisation de l'écran de jeu
     def initGameScreen(self):
         self._gameScreen = self._window.frames['GameScreen']
+        self._gameScreen.setNomJoueurPrincipal(self._pseudo)
         # Gestion des évènements sur le canvas
         # self._gameScreen.getCanvas().bind('<B1-Motion>', self.moveCard)
         self._gameScreen.getCanvas().bind('<ButtonRelease-1>', self.relacherCarte)
 
+    # Validation du pseudo entré par l'utilisateur au début
     def validerPseudo(self):
-        # pseudo = self._hebergerScreen._inputPseudo.get()
         self._pseudo = self._window.frames['PseudoScreen'].getInputPseudo().get()
         print('Pseudo du joueur principal %s' % self._pseudo)
+        self._gameScreen.setNomJoueurPrincipal(self._pseudo)
+        # On a le nom du joueur alors on peut créer le Game
         self._game = Game(self._pseudo)
         # On change d'écran
         self._window.show_frame('GameModeScreen')
-        # self._mainPlayer = Joueur(pseudo)
-        # self._game.addJoueur(self._mainPlayer)
-        # print('Nombre de Joueurs après création joueur principal %d' % self._game.getNBJoueurs())
 
+    # Validation du choix de mode de jeu où l'on souhaite HOST une partie
     def validerHeberger(self):
         # Mise en place bus ivy avec le pseudo rentré par le joueur
         self._ivyBus = IvyBus(self._pseudo, self._game, self._window, True, "192.168.1.255")
         self._window.setAdapteurVue(self._ivyBus.getAdapteur_vue())
         self._window.show_frame('HebergerScreen')
 
+    # Validation du choix de mode de jeu où l'on cherche à rejoindre un HOST
     def validerRejoindre(self):
         self._window.show_frame('RejoindreScreen')
 
+    # Validation de l'adresse entrée par le joueur qui essaye de joindre un HOST
     def validerAdresseJoindreHost(self, event):
         self._ivyBus = IvyBus(self._pseudo, self._game, self._window, False, self._rejoindreScreen.getInputAdresseText())
         if (self._ivyBus is not None):
-            self._window.setAdapteurVue(self._ivyBus.getAdapteur_vue())
+            # self._window.setAdapteurVue(self._ivyBus.getAdapteur_vue())
             self._rejoindreScreen.getInputAdresse().config(state='disabled')
 
+    # Fonction de validation de la partie pour le joiner
     def validerJoueurPret(self):
         self._rejoindreScreen.montrerLabelPret()
         self._rejoindreScreen.desactiverBoutonPret()
         IvySendMsg("CMDVIEW | joueurPret | {0}".format(self._pseudo))
 
+    # Fonction de validation de la partie par le HOST
     def validerPartie(self):
-        # On met le Game en place
-        self._game = Game(self._pseudo)
+        # On initialise le Game
         self._game.setAdapteurModel(self._ivyBus.getAdapteur_model())
         self._game.initialiser()
+        self._game.startTurn()
+        # On met en place le GameScreen
         self._window.reset_screen("GameScreen")
+        self.initGameScreen()
+        # Si toutes ces conditions sont vérifiées alors le joueur peut poser sa carte
+        for i in range(self._game.getNBJoueurs()):
+            joueur = self._game.getPlayerByIndex(i)
+            self._gameScreen.ajouterInfosJoueur(joueur.getJoueurInfos(), joueur.getPseudo())
+            # On prévient les autres de passer à l'écran de Jeu
+            IvySendMsg("CMDVIEW | prepareLabelsGameScreen | {0} | {1}".format(joueur.getJoueurInfos(), joueur.getPseudo()))
+        self._gameScreen.updateLayout()
+        # self._gameScreen.getCanvas().tag_bind(self._gameScreen.getCartePile(), '<Button-1>', self.selectionnerCarte)
+        self._window.show_frame("GameScreen")
+        IvySendMsg("CMDVIEW | lancerPartie")
 
     def validerPartieSolo(self):
         # On reset la partie pour etre safe
@@ -114,27 +131,42 @@ class Controller:
             print('move carte')
             self._gameScreen.getCanvas().coords(self._gameScreen.getCartePile(), event.x, event.y)
 
+    # Sélection de la carte à jouer
+    def selectionnerCarte(self, event):
+        if self._game.stateRamasserPli:
+            print('ramasse')
+        if (self._game.started == True) and self._game.currentState != self._game.stateRamasserPli:
+            print(self._game.participantsTour[0].pseudo)
+            if self._game.participantsTour[0].pseudo == self._game.name:
+                # self._gameScreen.setPeutJouer(True)
+                print('entre dans selection carte')
+                # self._cartePile = self._canvas.find_closest(event.x, event.y)[0] # Le 0 c'est car on prend la 1ere
+                self._gameScreen._carteAJouer = self._gameScreen.getCanvas().find_withtag('carte_a_jouer')[0]
+
+    # Quand on relâche la carte à jouer
     def relacherCarte(self, event):
-        if self._gameScreen.getCartePile() is not None:
-            print('carte relachee')
-            enclosedObjects = self._gameScreen.getEnclosedObjectsZoneJeu()
-            isCarteDansZoneJeu = False
-            if len(enclosedObjects) > 0:
-                for item in enclosedObjects:
-                    if (item is self._gameScreen.getCartePile()):
-                        isCarteDansZoneJeu = True
-                        # Alors on montre la carte dans la zone de jeu
-                        carteAJouer = self._mainPlayer.getCarteAJouer()
-                        fileNameCarteAJouer = carteAJouer.getNomCarteFormatFichier()
-                        script_dir = os.path.dirname(__file__)
-                        rel_path = "..\\images\\{0}.png"
-                        abs_file_path = os.path.join(script_dir, rel_path)
-                        abs_file_path = abs_file_path.format(fileNameCarteAJouer)
-                        print(abs_file_path)
-                        # On remet la carte face cachée à sa place d'origine et affiche la carte jouée
-                        self._gameScreen.placerCarteJouee(abs_file_path)
-            if (isCarteDansZoneJeu == False):
-                self._gameScreen.resetPositionCartePile()
-            if (self._nbCartesJouees == self._game.getNBJoueurs()):
-                self.affrontement()
-            self._gameScreen.setCartePile(None)
+        self._gameScreen._carteAJouer = None
+        enclosedObjects = self._gameScreen.getEnclosedObjectsZoneJeu()
+        if len(enclosedObjects) > 0:
+            for item in enclosedObjects:
+                if (item is self._gameScreen.getCartePile()):
+                    print('carte relachee')
+                    # Alors on montre la carte dans la zone de jeu
+                    carteAJouer = self._game.getPlayerByName(self._game.name).getCarteAJouer()
+                    nom_carte = carteAJouer.getNomCarte()
+                    fileNameCarteAJouer = carteAJouer.getNomCarteFormatFichier()
+                    script_dir = os.path.dirname(__file__)
+                    rel_path = "..\\images\\{0}.png"
+                    abs_file_path = os.path.join(script_dir, rel_path)
+                    abs_file_path = abs_file_path.format(fileNameCarteAJouer)
+                    # On remet la carte face cachée à sa place d'origine et affiche la carte jouée
+                    # On prévient que l'on vient de poser sa carte
+                    infosCartePosee = "{0},{1},{2},{3}".format(abs_file_path, nom_carte, event.x, event.y)
+                    if self._ivyBus.isHost():
+                        self._game.adapteur_model.notifyCurrentPlayerPlayed()
+                        self._window._adapteur_vue.notifyCurrentPlayerPlayed(infosCartePosee)
+                    else:
+                        self._game.adapteur_model.askToHostToNotifyCurrentPlayerPlayed()
+                        self._window._adapteur_vue.askToHostToNotifyCurrentPlayerPlayed(infosCartePosee)
+                    self._gameScreen.setPeutJouer(False)
+        self._gameScreen.resetPositionCartePile()

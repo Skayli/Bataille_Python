@@ -44,16 +44,12 @@ class Carte:
     def isMemeValeur(self, other):
         return self.valeur == other.valeur
 
-    # Getter pour la valeur de la carte
-    def getValeur(self):
-        return self.valeur
-
-    # Getter pour la couleur de la carte
-    def getCouleur(self):
-        return self.couleur
-
     def getNomCarteFormatFichier(self):
-        if (self.valeur.value > 10):
-            return (str(self.valeur.name).lower() + '_' + str(self.couleur.name).lower())
+        if (self.valeur.value > 1 and self.valeur.value < 11):
+            valeur = self.valeur.value
         else:
-            return (str(self.valeur.value).lower() + '_' + str(self.couleur.name).lower())
+            valeur = self.valeur.name
+        return "{0}_{1}".format(valeur, self.couleur.name)
+
+    def getNomCarte(self):
+        return "{0}_{1}".format(str(self.valeur), str(self.couleur))

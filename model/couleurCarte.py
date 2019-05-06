@@ -8,3 +8,7 @@ class CouleurCarte(Enum):
 
     def __str__(self):
         return str(self.name)
+
+    # Surcharge de l'opérateur "=="
+    def __eq__(self, other):
+        return self.value == other.value

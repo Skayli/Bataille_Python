@@ -4,6 +4,7 @@ class Joueur:
         self.pseudo = pseudo
         self.listeCartes = []
         self.initialiser()
+        self.doitAgir = False
 
     def __repr__(self):
         return "[Joueur => pseudo : " + self.pseudo + " | Nombre de cartes : " + str(self.getNbCartes()) + "]"
@@ -27,3 +28,6 @@ class Joueur:
 
     def addCarte(self, carte):
         self.listeCartes.append(carte)
+
+    def getJoueurInfos(self):
+        return "{0} : Nombre de cartes restantes {1}".format(self.pseudo, self.getNbCartes())

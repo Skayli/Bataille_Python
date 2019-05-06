@@ -51,3 +51,6 @@ class PseudoScreen(Frame):
         if (self._defaultTextEntry):
             self._inputPseudo.delete(0, END)
             self._defaultTextEntry = False
+
+    def setController(self, controller):
+        self._controller = controller

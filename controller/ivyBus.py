@@ -3,6 +3,7 @@ import os
 import signal
 import sys
 import time
+import re
 
 from ivy.std_api import *
 from ivy.ivy import ivylogger
@@ -29,19 +30,13 @@ class IvyBus:
         self._isHost = isHost
         # self._game = Game(IVYAPPNAME)
         self._adapteur_model = Adapteur_model()
-        # self._game.setAdapteurModel(self._adapteur_model)
+        game.setAdapteurModel(self._adapteur_model)
 
         # self._cadre = cadre
         self._adapteur_vue = Adapteur_vue()
         cadre.setAdapteurVue(self._adapteur_vue)
 
         ivy_bus = adresse
-        # if self._isHost == True:
-        #     ivy_bus = "192.168.1.255"
-        #     self._isHost = True
-        # else:
-        #     ivy_bus =  "192.168.1.31"#input("Saissisez l'adresse IP de l'hote de la partie : ")
-
         ivy_bus = ivy_bus+":2010"
 
         IvyInit(IVYAPPNAME, readymsg, 0, self.on_connection_change, self.on_die)
@@ -56,24 +51,6 @@ class IvyBus:
         self.info("Nombre d'autres utilisateurs connectés : " + str(count))
         print("---------------------------------------------------------------")
 
-        # while 1:
-        #     msg = input('')
-        #
-        #     if msg == ".lancer":
-        #         if self._isHost:
-        #             game.initialiser()
-        #     elif msg == ".liste":
-        #         print("Liste des joueurs de la partie :")
-        #         game.printListeJoueurs()
-        #     elif msg == ".quit":
-        #         IvyStop()
-        #         break
-        #     elif msg== ".carte":
-        #         print("Prochaine carte à jouer de J1 : " + str(game.getPlayerByName("j1").getCarteAJouer()))
-        #         print("Prochaine carte à jouer de J2 : " + str(game.getPlayerByName("j2").getCarteAJouer()))
-        #     else:
-        #         IvySendMsg(IVYAPPNAME + " : " + msg)
-
     # Ivy functions -------------------------------------------------------------------
     def info(self, fmt, *arg):
             print(fmt % arg)
@@ -86,7 +63,9 @@ class IvyBus:
             count = len(IvyGetApplicationList())
             print("Count : " + str(count))
             # Si on est le host alors on va donner l'ordre de refresh la liste des joueurs dans le lobby du host
-            agentName = repr(agent).strip('0123456789.:() ')
+            # agentName = repr(agent).strip('0123456789.:() ')
+            agentName = repr(agent)
+            agentName = agentName[agentName.find("(")+1:agentName.find(")")]
             if (self._isHost == True):
                 self._adapteur_vue.prepareCommand(("CMDVIEW | updateLabelsJoueursHebergerScreen | %s" % agentName))
             else:
@@ -120,3 +99,9 @@ class IvyBus:
 
     def getAdapteur_vue(self):
         return self._adapteur_vue
+
+    def getNombreJoueurs(self):
+        return len(IvyGetApplicationList())
+
+    def isHost(self):
+        return self._isHost

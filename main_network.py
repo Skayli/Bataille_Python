@@ -66,10 +66,10 @@ while True:
         break
 
 if host == "h":
-    ivy_bus = "192.168.1.255"
+    ivy_bus = "127.255.255.255"
     isHost = True
 else:
-    ivy_bus =  "192.168.1.255"#input("Saissisez l'adresse IP de l'hote de la partie : ")
+    ivy_bus =  "192.168.1.31"#input("Saissisez l'adresse IP de l'hote de la partie : ")
 
 ivy_bus = ivy_bus+":2010"
 
@@ -91,6 +91,8 @@ while 1:
     if msg == ".lancer":
         if isHost:
             game.initialiser()
+            game.startTurn()
+
     elif msg == ".liste":
         print("Liste des joueurs de la partie :")
         game.printListeJoueurs()
@@ -98,7 +100,35 @@ while 1:
         IvyStop()
         break
     elif msg== ".carte":
-        print("Prochaine carte à jouer de J1 : " + str(game.getPlayerByName("j1").getCarteAJouer()))
-        print("Prochaine carte à jouer de J2 : " + str(game.getPlayerByName("j2").getCarteAJouer()))
+        for joueur in game.listeJoueurs:
+            print("Prochaine carte à jouer de " + joueur.pseudo + " : " + str(joueur.getCarteAJouer()))
+    elif msg == ".jouer":
+        if (game.started == True) and game.currentState != game.stateRamasserPli:
+            if game.participantsTour[0].pseudo == game.name:
+                if isHost == True:
+                    game.adapteur_model.notifyCurrentPlayerPlayed()
+                else:
+                    game.adapteur_model.askToHostToNotifyCurrentPlayerPlayed()
+            else:
+                print("ATTENTION : c'est à " + game.participantsTour[0].pseudo + " de jouer")
+        else:
+            if not game.started:
+                print("Veuillez attendre que la game commence")
+            else:
+                print("Attendez que " + game.currentState.ramasseur.pseudo + " ramasse les cartes")
+    elif msg == ".ramasser":
+        if (game.started == True) and game.currentState == game.stateRamasserPli:
+            if(game.currentState.ramasseur.pseudo == game.name):
+                if isHost == True:
+                    game.adapteur_model.notifyCarteRamassee(game.pli[0])
+                else:
+                    game.adapteur_model.askToHostToNotifyCarteRamassee(game.pli[0])
+            else:
+                if not game.started:
+                    print("Veuillez attendre que la game commence")
+                else:
+                    print("Il faut finir le tour avant de ramasser")
+    elif msg == ".participants":
+        print(game.participantsTour)
     else:
         IvySendMsg(IVYAPPNAME + " : " + msg)

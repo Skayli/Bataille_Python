@@ -3,6 +3,10 @@ from model.valeurCarte import *
 from model.carte import *
 from model.joueur import *
 from random import randint
+from model.states.stateTourNormal import *
+from model.states.stateRamasserPli import *
+from model.states.statePremierCoupBataille import *
+from model.states.stateDeuxiemeCoupBataille import *
 
 class Game:
 
@@ -11,8 +15,17 @@ class Game:
         self.listeCartes = []
         self.pli = []
         self.participantsBataille = []
-        self.battle = False
+        self.started = False
         self.name = name
+
+        self.participantsTour = []
+
+        self.stateTourNormal = StateTourNormal(self)
+        self.statePremierCoupBataille = StatePremierCoupBataille(self)
+        self.stateDeuxiemeCoupBataille = StateDeuxiemeCoupBataille(self)
+        self.stateRamasserPli = StateRamasserPli(self)
+
+        self.currentState = self.stateTourNormal
 
     # Initialise un paquet de carte, le mélange et le distribue aux listeJoueurs
     # de telle sorte que chacun possède le même nombre de cartes
@@ -28,7 +41,8 @@ class Game:
             for j in self.listeJoueurs:
                 j.addCarte(self.listeCartes.pop(0))
 
-        self.adapteur_model.initGameForAllPlayers(self)
+        self.started = True
+        self.adapteur_model.initGameForAllPlayers()
 
     # Initialise un paquet de carte complet
     def initialiserListeCartes(self):
@@ -71,6 +85,15 @@ class Game:
     def isOver(self, joueur):
         return joueur.getNbCartes() == 0
 
+    def startTurn(self):
+        if self.isFinished():
+            print("PARTIE TERMINEE")
+        else:
+            self.currentState.initialiser()
+
+    # A COMPLETER
+    def isFinished(self):
+        return False
 
     def playRound(self):
         print("toast")
@@ -257,4 +280,15 @@ class Game:
         for player in self.listeJoueurs:
             if player.pseudo == name:
                 return player
+        return None
+
+    def getCardFromPli(self, color, value):
+        for card in self.pli:
+            if (card.couleur == color) and (card.valeur == value):
+                return card
+        return None
+
+    def getPlayerByIndex(self, index):
+        if index < self.getNBJoueurs():
+            return self.listeJoueurs[index]
         return None

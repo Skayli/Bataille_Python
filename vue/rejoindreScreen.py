@@ -93,3 +93,6 @@ class RejoindreScreen(Frame):
 
     def actionRetour(self):
         self.mainFrame.show_frame("GameModeScreen")
+
+    def setController(self, controller):
+        self._controller = controller

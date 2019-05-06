@@ -22,9 +22,11 @@ class HebergerScreen(Frame):
         # Infos sur les autres joueurs
         self._labelsJoueurs = []
         # ComboBox pour choisir le nombre de joueurs
-        self._comboBoxAdversaires = Combobox(self, values=["1 adversaire", "2 adversaires", "3 adversaires"])
+        self._comboBoxValues = ["Aucun bot", "1 adversaire", "2 adversaires", "3 adversaires"]
+        self._comboBoxAdversaires = Combobox(self, values=self._comboBoxValues)
         self._comboBoxAdversaires.current(0)
         self._comboBoxAdversaires.configure(state="readonly")
+        self._comboBoxAdversaires.bind("<<ComboboxSelected>>", self.comboBoxChange)
         # Les boutons
         # self._boutonJouer = Button(self, text='Jouer', command= lambda: mainFrame.show_frame("GameScreen"))
         self._boutonJouer = Button(self, text='Jouer')
@@ -38,6 +40,8 @@ class HebergerScreen(Frame):
         self._comboBoxAdversaires.pack(side="top", pady=30)
         self._boutonJouer.place(relx=0.25, rely=0.90, anchor=SW)
         self._boutonRetour.place(relx=0.75, rely=0.90, anchor=SE)
+        # Par défaut désactiver boutonJouer
+        self.desactiverBoutonJouer()
 
     def updateLabelsJoueurs(self):
         # Placement des composants représentant les joueurs qui arrivent sur le lobby
@@ -67,6 +71,23 @@ class HebergerScreen(Frame):
             self.activerBoutonJouer()
         else:
             self.desactiverBoutonJouer()
+
+    def updateComboBoxBots(self):
+        newValues = []
+        selectedIndex = self._comboBoxAdversaires.current()
+        if selectedIndex > (4-self._nbJoueursHumains):
+            selectedIndex = (4-self._nbJoueursHumains)
+        for i in range((4-self._nbJoueursHumains)+1):
+            newValues.append(self._comboBoxValues[i])
+        self._comboBoxAdversaires.config(values=newValues)
+        self._comboBoxAdversaires.current(selectedIndex)
+
+    def comboBoxChange(self, event):
+        if (self._nbJoueursHumains == 1):
+            if (self._comboBoxAdversaires.current() > 0):
+                self.activerBoutonJouer()
+            else:
+                self.desactiverBoutonJouer()
 
     def getBoutonRetour(self):
         return self._boutonRetour
@@ -100,3 +121,6 @@ class HebergerScreen(Frame):
 
     def isAllJoueursHumainsPrets(self):
         return (self._nbJoueursHumains == self._nbJoueursHumainsPrets)
+
+    def setController(self, controller):
+        self._controller = controller

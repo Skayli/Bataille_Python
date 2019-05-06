@@ -21,12 +21,14 @@ class Cadre(Tk):
         self._queue = queue
         # Adapteur_vue
         self._adapteur_vue = None
+        # Controller
+        self._contoller = None
         # Composants graphiques
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
         self._helv20 = Font(family='Helvetica', size=20, weight='bold')
 
         self.title("Jeu de la bataille")
-        self.geometry("1280x720")
+        self.geometry("1366x768")
 
         self.container = Frame(self)
         self.container.pack(side="top", fill="both", expand=True)
@@ -38,7 +40,6 @@ class Cadre(Tk):
             page_name = F.__name__
             frame = F(parent=self.container, mainFrame=self)
             self.frames[page_name] = frame
-
             # put all of the pages in the same location;
             # the one on the top of the stacking order
             # will be the one that is visible.
@@ -53,6 +54,7 @@ class Cadre(Tk):
                 pageType = frame.__class__
                 frame = pageType(parent=self.container, mainFrame=self)
                 self.frames[nom_screen] = frame
+                self.frames[nom_screen].setController(self._controller)
                 frame.grid(row=0, column=0, sticky="nsew")
 
     def show_frame(self, page_name):
@@ -66,6 +68,11 @@ class Cadre(Tk):
     def setAdapteurVue(self, adapteur_vue):
         self._adapteur_vue = adapteur_vue
         adapteur_vue.setCadre(self)
+
+    def setController(self, controller):
+        self._controller = controller
+        for key, frame in self.frames.items():
+            frame.setController(self._controller)
 
     def processIncoming(self):
         """

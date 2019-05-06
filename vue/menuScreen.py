@@ -33,3 +33,6 @@ class MenuScreen(Frame):
 
     def getBoutonQuitter(self):
         return self._boutonQuitter
+
+    def setController(self, controller):
+        self._controller = controller

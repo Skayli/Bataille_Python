@@ -66,6 +66,9 @@ class GameModeScreen(Frame):
         self._boutonRejoindre.configure(font = helv36)
         self._boutonQuitter.configure(font = helv36)
 
+    def setController(self, controller):
+        self._controller = controller
+
     def getBoutonHeberger(self):
         return self._boutonHeberger
 

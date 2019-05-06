@@ -18,19 +18,18 @@ class ThreadedClient:
         the GUI. We spawn a new thread for the worker.
         """
         # self.gui = gui
-
         # Create the queue
         self.queue = Queue.Queue()
-
         # Set up the GUI part
         self.gui = Cadre(self.queue)
-
+        # Set up the Controller
+        self.controller = Controller(self.gui)
+        self.gui.setController(self.controller)
         # Set up the thread to do asynchronous I/O
         # More can be made if necessary
         self.running = 1
         # self.thread1 = threading.Thread(target=self.workerThread1)
         # self.thread1.start()
-
         # Start the periodic call in the GUI to check if the queue contains
         # anything
         self.periodicCall()
