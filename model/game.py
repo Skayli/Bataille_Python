@@ -47,7 +47,6 @@ class Game:
     # Initialise un paquet de carte complet
     def initialiserListeCartes(self):
         self.listeCartes = []
-
         for couleur in CouleurCarte:
             for valeur in ValeurCarte:
                 self.listeCartes.append(Carte(couleur, valeur))

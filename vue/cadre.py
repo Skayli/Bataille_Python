@@ -24,7 +24,7 @@ class Cadre(Tk):
         # Controller
         self._contoller = None
         # Composants graphiques
-        self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
+        self.title_font = tkfont.Font(family='Helvetica', size=20, weight="bold")
         self._helv20 = Font(family='Helvetica', size=20, weight='bold')
 
         self.title("Jeu de la bataille")

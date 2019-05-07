@@ -63,7 +63,6 @@ class IvyBus:
             count = len(IvyGetApplicationList())
             print("Count : " + str(count))
             # Si on est le host alors on va donner l'ordre de refresh la liste des joueurs dans le lobby du host
-            # agentName = repr(agent).strip('0123456789.:() ')
             agentName = repr(agent)
             agentName = agentName[agentName.find("(")+1:agentName.find(")")]
             if (self._isHost == True):
@@ -92,7 +91,7 @@ class IvyBus:
             print(arg[0])
 
     def on_direct_msg(self, agent, num_id, msg):
-        print("Message de la part de " + IvygetApplcationName(agent) + " : " + msg)
+        print("Message de la part de " + IvyGetApplicationName(agent) + " : " + msg)
 
     def getAdapteur_model(self):
         return self._adapteur_model

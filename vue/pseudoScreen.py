@@ -15,9 +15,10 @@ class PseudoScreen(Frame):
     def __init__(self, parent, mainFrame):
         Frame.__init__(self, parent)
         self.mainFrame = mainFrame
+        self.config(bg='linen')
         # Création des composants
         # Label de titre
-        label = Label(self, text="Veuillez choisi un pseudo", font=mainFrame.title_font)
+        label = Label(self, text="Veuillez choisi un pseudo", font=mainFrame.title_font, borderwidth=2, relief="groove", bg='linen')
         # La zone de saisie pour le pseudo
         helv16 = Font(family='Helvetica', size=16, weight='bold')
         self._defaultTextEntry = True
@@ -25,10 +26,10 @@ class PseudoScreen(Frame):
         self._inputPseudo.insert(END, "Pseudo")
         self._inputPseudo.bind("<Button-1>", self.clearDefaultTextEntry)
         # Les boutons
-        self._boutonValider = Button(self, text='Continuer')
-        self._boutonRetour = Button(self, text='Retour', command= lambda: self.mainFrame.show_frame("MenuScreen"))
+        self._boutonValider = Button(self, text='Continuer', bg='lightcyan2')
+        self._boutonRetour = Button(self, text='Retour', bg='lightcyan2', command= lambda: self.mainFrame.show_frame("MenuScreen"))
         # Placement des composants
-        label.pack(side="top", fill="x", pady=10)
+        label.pack(side="top", fill="x", pady=10, ipady=20)
         self._inputPseudo.pack(side="top", pady=10)
 
         self._boutonValider.pack(pady="50")

@@ -16,52 +16,49 @@ class GameScreen(Frame):
     def __init__(self, parent, mainFrame):
         Frame.__init__(self, parent)
         self.mainFrame = mainFrame
+        self.config(bg='linen')
         # Infos sur les éléments constituant le plateau
         self._nomJoueurPrincipal = None
-        self._joueurs = []
         self._piles_FC = {}
         self._dict_imagesCartes = {}
         self._cartePile = None
         self._carteAJouer = None
+        self._cartePliSelected = None
         self._index_cartes_sur_tapis = 0
         self._peutJouer = False
         # Label titre
-        label = Label(self, text="Jeu de la bataille", font=mainFrame.title_font)
+        label = Label(self, text="Jeu de la bataille", font=mainFrame.title_font, bg='linen')
         # label.pack(side="top", fill="x", pady=10)
-        label.grid(row=0, column=1)
+        label.grid(row=0, column=1, ipady=20)
 
-        self._canvas = Canvas(self, width=800, height=600, bg='green')
+        self._canvas = Canvas(self, width=800, height=600, bg='sea green')
         # Gestion évènements
         self._canvas.bind('<B1-Motion>', self.moveCard)
         # Dessin du cadre dans lequel faudra placer les cartes
         self._tag_zone_jeu = 'zone_jeu'
         self._x1, self._y1, self._x2, self._y2 = 150, 150, (int(self._canvas.cget('width'))-150), (int(self._canvas.cget('height'))-150)
-        self._zoneJeu = self._canvas.create_rectangle(self._x1, self._y1, self._x2, self._y2, width='2', tags=self._tag_zone_jeu)
+        self._zoneJeu = self._canvas.create_rectangle(self._x1, self._y1, self._x2, self._y2, width='2', tags=self._tag_zone_jeu, fill='SpringGreen4')
+        # Zone invisible pour le retrait des cartes lors du pli
+        self._x1_zoneRetrait = 150
+        self._y1_zoneRetrait = self._y2
+        self._x2_zoneRetrait = self._x2
+        self._y2_zoneRetrait = (int(self._canvas.cget('height')))
+        # self._zoneRetrait = self._canvas.create_rectangle(self._x1_zoneRetrait, self._y1_zoneRetrait, self._x2_zoneRetrait, self._y2_zoneRetrait, fill='SpringGreen3', tags="zone_retrait")
         # print('zone de jeu = %d' % self._zoneJeu)
         # self._canvas.place(relx=0.5, rely=0.5, anchor=CENTER)
         # self._canvas.pack(side="bottom", fill="both")
         self._canvas.grid(row=2, column=1)
 
-        # self._liste_cartes_en_jeu = ["as_coeur", "as_pique", "as_trefle", "as_carreau"]
-        # self._liste_cartes_en_jeu = ["face_cachee"]
-        # self.update_dictionnaire_images()
+        self.helv12 = Font(family='Helvetica', size=12, weight='bold')
+        self.labelsJoueurs = {}
+        # for i in range(4):
+        #     self.labelsJoueurs[i] = Label(self, text='', font=helv12)
 
-        helv12 = Font(family='Helvetica', size=12, weight='bold')
-        # self.labelsJoueurs = [Label(self._canvas, text=''), Label(self._canvas, text=''), Label(self._canvas, text=''), Label(self._canvas, text='')]
-        # self.labelsJoueurs = [Label(self, text=''), Label(self, text=''), Label(self, text=''), Label(self, text='')]
-        self.labelsJoueurs = []
-        for i in range(4):
-            self.labelsJoueurs.append(Label(self, text='', font=helv12))
-
-        # self.labelsJoueurs[0].place(relx=0.5, rely=0.98, anchor=S)
-        # self.labelsJoueurs[1].place(relx=0.5, rely=0.02, anchor=N)
-        # self.labelsJoueurs[2].place(relx=0.95, rely=0.5, anchor=E)
-        # self.labelsJoueurs[3].place(relx=0.05, rely=0.5, anchor=W)
-        # self.placerLabelsJoueurs()
+        self._labelInfoGame = Label(self, text='Que le meilleur gagne !', font=self.helv12, bg='linen')
+        self._labelInfoGame.grid(row=4, column=1)
         # Config en plus
         # self.labelsJoueurs[0].configure(borderwidth=4, relief='solid')
-        boutonRetour = Button(self, text="Retour au menu", command=lambda: mainFrame.show_frame("LobbyScreen"))
-        # button1.pack()
+        boutonRetour = Button(self, text="Retour au menu", command=lambda: mainFrame.show_frame("GameModeScreen"), bg='lightcyan2')
         boutonRetour.grid(row=4, column=2)
 
         self.columnconfigure(0, weight=1)
@@ -78,19 +75,19 @@ class GameScreen(Frame):
         self._controller = controller
 
     def placerLabelsJoueurs(self):
-        indexJouerPrincipal = self.trouverIndexJoueurPrincipal()
+        joueurPrincipal = self.trouverJoueurPrincipal()
         haut, gauche, droite = False, False, False
-        self.labelsJoueurs[indexJouerPrincipal].grid(row=3, column=1, ipadx=10, ipady=10)
-        for i in range(len(self.labelsJoueurs)):
-            if i != indexJouerPrincipal:
+        self.labelsJoueurs[joueurPrincipal].grid(row=3, column=1, ipadx=10, ipady=10)
+        for key, value in self.labelsJoueurs.items():
+            if key != joueurPrincipal:
                 if haut == False:
-                    self.labelsJoueurs[i].grid(row=1, column=1, ipadx=10, ipady=10)
+                    self.labelsJoueurs[key].grid(row=1, column=1, ipadx=10, ipady=10)
                     haut = True
                 elif gauche == False:
-                    self.labelsJoueurs[i].grid(row=2, column=0, ipadx=10, ipady=10)
+                    self.labelsJoueurs[key].grid(row=2, column=0, ipadx=10, ipady=10)
                     gauche = True
                 elif droite == False:
-                    self.labelsJoueurs[i].grid(row=2, column=2, ipadx=10, ipady=10)
+                    self.labelsJoueurs[key].grid(row=2, column=2, ipadx=10, ipady=10)
                     droite = True
 
     def update_dictionnaire_images(self):
@@ -169,10 +166,14 @@ class GameScreen(Frame):
         self._y_BaseCarteAJouer = heightCanvas - (heightCarte/2)
         tag = 'carte_a_jouer'
         self._cartePile = self._canvas.create_image(self._x_BaseCarteAJouer, self._y_BaseCarteAJouer, image=photo, tags=tag)
-        self._dict_imagesCartes[self._index_cartes_sur_tapis]= photo
+        self._dict_imagesCartes[tag]= photo
         # self._index_cartes_sur_tapis += 1
         self._canvas.tag_bind(self._cartePile, '<Button-1>', self._controller.selectionnerCarte)
+        self._canvas.tag_bind(self._cartePile, '<Motion>', self.motionCartePile)
         # self._canvas.tag_bind(self._cartePile, '<Button-1>', self.selectionnerCarte)
+
+    def motionCartePile(self, event):
+        self._canvas.config(cursor="hand1")
 
     def afficherCartesPiles(self):
         # On vide le dictionnaire
@@ -262,6 +263,13 @@ class GameScreen(Frame):
         if self._carteAJouer is not None:
             print('move carte')
             self._canvas.coords(self._cartePile, event.x, event.y)
+        elif self._cartePliSelected is not None:
+            print('move carte Pli')
+            self._canvas.coords(self._cartePliSelected, event.x, event.y)
+
+    def deplacerCarte(self, nom_carte, x, y):
+        carteADeplacer = self._canvas.find_withtag(nom_carte)[0]
+        self._canvas.coords(carteADeplacer, x, y)
 
     def relacherCarte(self, event):
         if self._cartePile is not None:
@@ -277,13 +285,18 @@ class GameScreen(Frame):
     def showCarte(self, nomFichierCarte, nomCarte, x, y):
         photo = ImageTk.PhotoImage(file= nomFichierCarte)
         tag = nomCarte
+        print(tag)
         item = self._canvas.create_image(x, y, image=photo, tags=tag)
         # self._dict_imagesCartes[self._index_cartes_sur_tapis]= photo
         self._dict_imagesCartes[tag]= photo
         self._index_cartes_sur_tapis += 1
+        self._canvas.tag_bind(item, '<Button-1>', self._controller.selectionnerCartePli)
 
     def getEnclosedObjectsZoneJeu(self):
         return self._canvas.find_enclosed(self._x1, self._y1, self._x2, self._y2)
+
+    def getEnclosedObjectsZoneRetraitCarte(self):
+        return self._canvas.find_enclosed(self._x1_zoneRetrait, self._y1_zoneRetrait, self._x2_zoneRetrait, self._y2_zoneRetrait)
 
     def getCanvas(self):
         return self._canvas
@@ -316,7 +329,7 @@ class GameScreen(Frame):
         self._nomJoueurPrincipal = nom
 
     def getNombreJoueurs(self):
-        return len(self._joueurs)
+        return len(self.labelsJoueurs)
 
     def peutJouer(self):
         return self._peutJouer
@@ -324,24 +337,29 @@ class GameScreen(Frame):
     def setPeutJouer(self, value):
         self._peutJouer = value
 
+    def getLabelInfoGame(self):
+        return self._labelInfoGame
+
+    def setLabelInfoGame(self, info):
+        self._labelInfoGame['text'] = info
+
     def ajouterInfosJoueur(self, infos, nom):
-        for label in self.labelsJoueurs:
-            if label['text'] == '':
-                label['text'] = str(infos)
-                self._joueurs.append(nom)
-                break
+        self.labelsJoueurs[nom] = Label(self, text=infos, font=self.helv12, bg='linen')
 
-    def modifierInfosJoueurAt(self, infos, nom, index):
-        if index < len(self.labelsJoueurs):
-            self.labelsJoueurs[index]['text'] = infos
+    def updateLabelJoueur(self, nom, infos):
+        self.labelsJoueurs[nom]['text'] = infos
 
-    def trouverIndexJoueurPrincipal(self):
-        for i in range(len(self._joueurs)):
-            if (self._joueurs[i] == self._nomJoueurPrincipal):
-                return i
+    # def modifierInfosJoueurAt(self, infos, nom, index):
+    #     if index < len(self.labelsJoueurs):
+    #         self.labelsJoueurs[index]['text'] = infos
+
+    def trouverJoueurPrincipal(self):
+        for key, value in self.labelsJoueurs.items():
+            if key == self._nomJoueurPrincipal:
+                return key
         return None
 
-    def cacherElementInutiles(self):
-        for label in self.labelsJoueurs:
-            if label['text'] == '':
-                label.place_forget()
+    # def cacherElementInutiles(self):
+    #     for label in self.labelsJoueurs:
+    #         if label['text'] == '':
+    #             label.place_forget()

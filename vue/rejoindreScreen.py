@@ -13,21 +13,23 @@ class RejoindreScreen(Frame):
     def __init__(self, parent, mainFrame):
         Frame.__init__(self, parent)
         self.mainFrame = mainFrame
+        self.config(bg='linen')
         # Titre du Frame
-        self._label = Label(self, text="Lobby Rejoindre Partie", font=mainFrame.title_font)
+        self._label = Label(self, text="Lobby Rejoindre Partie", font=mainFrame.title_font, bg='linen', borderwidth=2, relief="groove")
         # Label joueur host
-        self._label_host = Label(self)
+        self._label_host = Label(self, bg='linen')
         # Label pret
-        self._label_pret = Label(self, text="Vous êtes prêt !")
+        self._label_pret = Label(self, text="Vous êtes prêt !", bg='linen')
         # La zone de saisie pour l'adresse
-        self._labelAdresse = Label(self, text="Veuillez renseigner l'adresse de l'hébergeur", font=mainFrame.title_font)
+        self._labelAdresse = Label(self, text="Veuillez renseigner l'adresse de l'hébergeur", font=mainFrame.title_font, bg='linen')
         helv16 = Font(family='Helvetica', size=16, weight='bold')
         self._inputAdresse = Entry(self, font=helv16)
+        self._inputAdresse.insert(0, "192.168.1.31")
         # Les boutons
         # self._boutonJouer = Button(self, text='Jouer')
-        self._boutonRetour = Button(self, text='Retour', command= lambda: self.mainFrame.show_frame("GameModeScreen"))
+        self._boutonRetour = Button(self, text='Retour', bg='lightcyan2')
         # bouton spécial qui va pop une fois qu'on a trouvé un host
-        self._boutonPret = Button(self, text='Prêt')
+        self._boutonPret = Button(self, text='Prêt', bg='lightcyan2')
         # Polices pour les composants
         helv20 = Font(family='Helvetica', size=20, weight='bold')
         # self._boutonJouer.configure(font = helv20)
@@ -36,7 +38,7 @@ class RejoindreScreen(Frame):
         self._label_host.configure(font = helv20)
         self._label_pret.configure(font = helv20)
         # Placement des composants
-        self._label.pack(side="top", fill="x", pady=10)
+        self._label.pack(side="top", fill="x", pady=10, ipady=20)
         self._labelAdresse.pack(side="top", fill="x", pady=10)
         self._inputAdresse.pack(side="top", pady=10)
         self._label_host.pack(side="top", fill="x", pady=30)
