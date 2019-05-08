@@ -23,6 +23,7 @@ class Controller:
         self._pseudo = None
         self._statePremierCoupBataille = False
         self._ivyBus = None
+        self._actionsBots = []
 
         # Gestion pour le GameScreen
         self.initGameScreen()
@@ -59,7 +60,7 @@ class Controller:
         else:
             self._gameScreen.setNomJoueurPrincipal(self._pseudo)
             # On a le nom du joueur alors on peut créer le Game
-            self._game = Game(self._pseudo)
+            self._game = Game(self._pseudo, self)
             # On change d'écran
             self._window.frames['GameModeScreen']._label_bienvenue['text'] = "Bienvenue {0}".format(self._pseudo)
             self._window.show_frame('GameModeScreen')
@@ -103,10 +104,29 @@ class Controller:
 
     # Fonction de validation de la partie par le HOST
     def validerPartie(self):
-        self._game = Game(self._pseudo)
+        self._game = Game(self._pseudo, self)
         # On initialise le Game
         self._game.setAdapteurModel(self._ivyBus.getAdapteur_model())
-        self._game.initialiser()
+        # On récupère les paramètres de la partie
+        self.isPartieCourte = self._hebergerScreen.varControleMode.get()
+        if self.isPartieCourte == 'Standard':
+            self.isPartieCourte = False
+        else:
+            self.isPartieCourte = True
+        self.isCarteRetournee = self._hebergerScreen.varControleOption.get()
+        if self.isCarteRetournee == 'Classique':
+            self.isCarteRetournee = True
+        else:
+            self.isCarteRetournee = False
+        self.nbBots = self._hebergerScreen._comboBoxAdversaires.get()[0]
+        if self.nbBots == 'A':
+            self.nbBots = int(0)
+        else:
+            self.nbBots = int(self.nbBots)
+        print(self.nbBots)
+        print(self.isPartieCourte)
+        print(self.isCarteRetournee)
+        self._game.initialiser(self.nbBots, self.isPartieCourte, self.isCarteRetournee)
         self._game.startTurn()
         # On met en place le GameScreen
         self._window.reset_screen("GameScreen")
@@ -205,9 +225,28 @@ class Controller:
                         if self._ivyBus.isHost() == True:
                             self._game.adapteur_model.notifyCurrentPlayerPlayed()
                             self._window._adapteur_vue.notifyCurrentPlayerPlayed(infosCartePosee)
+                            self._window._adapteur_vue.notifyUpdateInfos(nomJoueur)
+                            # Prise en compte des Bots
+                            for i in range(len(self._actionsBots)):
+                                actionBot = self._actionsBots[i].split(',')
+                                action = actionBot[0]
+                                nomBot = actionBot[1]
+                                fileCarte = actionBot[2]
+                                nom_carte = actionBot[3]
+                                posX = actionBot[4]
+                                posY = actionBot[5]
+                                if (action == 'jouer'):
+                                    infosCartePosee = "{0},{1},{2},{3},{4}".format(nomBot, fileCarte, nom_carte, posX, posY)
+                                    # time.sleep(1)
+                                    self._window._adapteur_vue.notifyCurrentPlayerPlayed(infosCartePosee)
+                                elif action == 'ramasser':
+                                    infosCarte = "{0},{1}".format(nomBot, nom_carte)
+                                    # time.sleep(1)
+                                    self._window._adapteur_vue.notifyCartePliRecuperee(infosCarte)
                         else:
-                            self._game.adapteur_model.askToHostToNotifyCurrentPlayerPlayed()
                             self._window._adapteur_vue.askToHostToNotifyCurrentPlayerPlayed(infosCartePosee)
+                            self._game.adapteur_model.askToHostToNotifyCurrentPlayerPlayed()
+                            self._window._adapteur_vue.askToHostToNotifyUpdateInfos(nomJoueur)
                         self._gameScreen.setPeutJouer(False)
             self._gameScreen.resetPositionCartePile()
         elif (self._gameScreen._cartePliSelected is not None):
@@ -234,3 +273,34 @@ class Controller:
                 else:
                     self._window._adapteur_vue.askToHostToNotifyCarteDeplacement(infosCarteDeplacee)
             self._gameScreen._cartePliSelected = None
+
+    def stockerInfosBots(self, action, nomBot, carteAJouer):
+        nom_carte = carteAJouer.getNomCarte()
+        print('Bot Carte' + nom_carte)
+        fileNameCarteAJouer = carteAJouer.getNomCarteFormatFichier()
+        script_dir = os.path.dirname(__file__)
+        rel_path = "..\\images\\{0}.png"
+        abs_file_path = os.path.join(script_dir, rel_path)
+        abs_file_path = abs_file_path.format(fileNameCarteAJouer)
+        gameScreen = self._window.frames['GameScreen']
+        posX = randint(gameScreen.getXMinBot(), gameScreen.getXMaxBot())
+        posY = randint(gameScreen.getYMinBot(), gameScreen.getYMaxBot())
+        actionBot = "{0},{1},{2},{3},{4},{5}".format(action, nomBot, abs_file_path, nom_carte, posX, posY)
+        self._actionsBots.append(actionBot)
+
+    def gererPoseCarteBot(self, nomJoueur, carteAJouer):
+        nom_carte = carteAJouer.getNomCarte()
+        fileNameCarteAJouer = carteAJouer.getNomCarteFormatFichier()
+        script_dir = os.path.dirname(__file__)
+        print('Dossier ' + script_dir)
+        rel_path = "..\\images\\{0}.png"
+        abs_file_path = os.path.join(script_dir, rel_path)
+        abs_file_path = abs_file_path.format(fileNameCarteAJouer)
+        print('chemin fichier = ' + abs_file_path)
+        gameScreen = self._window.frames['GameScreen']
+        posX = randint(gameScreen.getXMinBot(), gameScreen.getXMaxBot())
+        posY = randint(gameScreen.getYMinBot(), gameScreen.getYMaxBot())
+        infosCartePosee = "{0},{1},{2},{3},{4}".format(nomJoueur, abs_file_path, nom_carte, posX, posY)
+        gameScreen.showCarte(abs_file_path, nom_carte, posX, posY)
+        IvySendMsg("CMDVIEW | cartePosee | {0}".format(infosCartePosee))
+        print('Refresh Carte Jouee par bot')

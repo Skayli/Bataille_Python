@@ -43,6 +43,11 @@ class GameScreen(Frame):
         self._y1_zoneRetrait = self._y2
         self._x2_zoneRetrait = self._x2
         self._y2_zoneRetrait = (int(self._canvas.cget('height')))
+        # Definition des bornes pour la pose de carte par les bots
+        self._xMinBot = self._x1+100
+        self._yMinBot = self._y1+100
+        self._xMaxBot = self._x2-100
+        self._yMaxBot = self._y2-100
         # self._zoneRetrait = self._canvas.create_rectangle(self._x1_zoneRetrait, self._y1_zoneRetrait, self._x2_zoneRetrait, self._y2_zoneRetrait, fill='SpringGreen3', tags="zone_retrait")
         # print('zone de jeu = %d' % self._zoneJeu)
         # self._canvas.place(relx=0.5, rely=0.5, anchor=CENTER)
@@ -261,10 +266,10 @@ class GameScreen(Frame):
 
     def moveCard(self, event):
         if self._carteAJouer is not None:
-            print('move carte')
+            # print('move carte')
             self._canvas.coords(self._cartePile, event.x, event.y)
         elif self._cartePliSelected is not None:
-            print('move carte Pli')
+            # print('move carte Pli')
             self._canvas.coords(self._cartePliSelected, event.x, event.y)
 
     def deplacerCarte(self, nom_carte, x, y):
@@ -283,7 +288,9 @@ class GameScreen(Frame):
             self._cartePile = None
 
     def showCarte(self, nomFichierCarte, nomCarte, x, y):
-        photo = ImageTk.PhotoImage(file= nomFichierCarte)
+        print('Dans showcarte')
+        photo = ImageTk.PhotoImage(file=nomFichierCarte)
+        print('Apres creation photo')
         tag = nomCarte
         print(tag)
         item = self._canvas.create_image(x, y, image=photo, tags=tag)
@@ -310,17 +317,29 @@ class GameScreen(Frame):
     def getIndexCartesSurTapis(self):
         return self._index_cartes_sur_tapis
 
-    def get_zoneJeu_X1():
+    def get_zoneJeu_X1(self):
         return self._x1
 
-    def get_zoneJeu_Y1():
+    def get_zoneJeu_Y1(self):
         return self._y1
 
-    def get_zoneJeu_X2():
+    def get_zoneJeu_X2(self):
         return self._x2
 
-    def get_zoneJeu_Y2():
+    def get_zoneJeu_Y2(self):
         return self._y2
+
+    def getXMinBot(self):
+        return self._xMinBot
+
+    def getXMaxBot(self):
+        return self._xMaxBot
+
+    def getYMinBot(self):
+        return self._yMinBot
+
+    def getYMaxBot(self):
+        return self._yMaxBot
 
     def getNomJoueurPrincipal(self):
         return self._nomJoueurPrincipal

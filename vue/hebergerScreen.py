@@ -25,29 +25,29 @@ class HebergerScreen(Frame):
         self._labelsJoueurs = []
         # ComboBox pour choisir le nombre de joueurs
         self.label_bot = Label(self, text='Nombre de bots', font=helv, bg='linen')
-        self._comboBoxValues = ["Aucun bot", "1 adversaire", "2 adversaires", "3 adversaires"]
+        self._comboBoxValues = ["Aucun Bot", "1 Bot", "2 Bots", "3 Bots"]
         self._comboBoxAdversaires = Combobox(self, values=self._comboBoxValues)
         self._comboBoxAdversaires.current(0)
         self._comboBoxAdversaires.configure(state="readonly")
         self._comboBoxAdversaires.bind("<<ComboboxSelected>>", self.comboBoxChange)
         # RadioBouton pour choisir le mode de jeu
         self.label_mode_jeu = Label(self, text="Mode de jeu", font=helv, bg='linen')
-        self.vals_mode_jeu = [0, 1]
+        self.vals_mode_jeu = ['Standard', 'Court']
         self.etiquettes_mode_jeu = ['Standard', 'Court']
-        self.varControleMode = IntVar()
+        self.varControleMode = StringVar()
         self.varControleMode.set(self.vals_mode_jeu[0])
         self._radio_btn_mode_jeu = []
         for i in range(2):
             self._radio_btn_mode_jeu.append(Radiobutton(self, variable=self.varControleMode, text=self.etiquettes_mode_jeu[i], value=self.vals_mode_jeu[i], font=helv, bg='linen'))
         # Radios Buttons pour l'option carte à l'envers
         self.label_option_alenvers = Label(self, text='Option Carte à l\'envers', font=helv, bg='linen')
-        self.vals_option_alenvers = [0, 1]
-        self.etiquettes_option_alenvers = ['Standard', 'Court']
-        self.varControleOption = IntVar()
+        self.vals_option_alenvers = ['Classique', 'Sans_Retourner']
+        self.etiquettes_option_alenvers = ['Classique', 'Sans Carte Retournée']
+        self.varControleOption = StringVar()
         self.varControleOption.set(self.vals_option_alenvers[0])
         self._radio_btn_option_alenvers = []
         for i in range(2):
-            self._radio_btn_option_alenvers.append(Radiobutton(self, variable=self.varControleOption, text=self.etiquettes_option_alenvers[i], value=self.vals_option_alenvers, font=helv, bg='linen'))
+            self._radio_btn_option_alenvers.append(Radiobutton(self, variable=self.varControleOption, text=self.etiquettes_option_alenvers[i], value=self.vals_option_alenvers[i], font=helv, bg='linen'))
         # Les boutons
         self._boutonJouer = Button(self, text='Jouer', bg='lightcyan2')
         self._boutonRetour = Button(self, text='Retour', bg='lightcyan2')

@@ -4,9 +4,11 @@ from model.couleurCarte import *
 from model.valeurCarte import *
 from model.carte import *
 from model.joueur import *
+from model.bot import *
 from model.game import *
 
 import time
+import os
 
 class Adapteur_model:
 
@@ -33,21 +35,34 @@ class Adapteur_model:
     def setPlayerTurnOrder(self):
         IvySendMsg("CMD | resetListeParticipantsTour")
         for player in self.game.participantsTour:
-            print("Ajout de " + player.pseudo + " A la liste des joueur au tour")
+            print("[Adapteur_model] Ajout à la liste des joueur au tour : " + str(player))
             IvySendMsg("CMD | addParticipantTour | " + player.pseudo)
 
     # HOST - Notifie tout le monde que le joueur courant a joué son coup
     def notifyCurrentPlayerPlayed(self):
         j = self.game.participantsTour.pop(0)
-        print("[Adapteur_model] A joué : " + j.pseudo)
+        print("[Adapteur_model] " + j.pseudo + " a joué " + str(j.listeCartes[0]))
         IvySendMsg("CMD | currentPlayerPlayed")
 
         if self.game.currentState.actionsTerminees():
             self.game.currentState.handleTurn()
+        elif isinstance(self.game.participantsTour[0], Bot):
+            # time.sleep(self.game.botWaitTime)
+            nomJoueur = self.game.participantsTour[0].getPseudo()
+            carteAJouer = self.game.participantsTour[0].getCarteAJouer()
+            action = 'jouer'
+            self.game.controller.stockerInfosBots(action, nomJoueur, carteAJouer)
+            self.notifyCurrentPlayerPlayed()
+
+    # HOST - Notifie tout le monde d'ajouter les cartes à la liste du joueur
+    def addPlayerCardToScore(self, player):
+        while(len(player.listeCartes) > 0):
+            player.listeScore.append(player.listeCartes.pop(0))
+            IvySendMsg("CMD | addPlayerCardToScore | " + player.pseudo)
+
 
     # Envoie un message à l'hote de dire à tous que le joueur courrant a joué son coup
     def askToHostToNotifyCurrentPlayerPlayed(self):
-        print("[Adapteur_model] J'AI JOUE")
         IvySendMsg("CMD | sendNotificationCurentPlayerPlayed")
 
     # Notifie tout le monde de retirer la carte du pli et de l'ajouté au paquet du joueur
@@ -56,18 +71,22 @@ class Adapteur_model:
         value = str(carte.valeur)
         carte = self.game.getCardFromPli(CouleurCarte[color], ValeurCarte[value])
         self.game.pli.remove(carte)
-        self.game.currentState.ramasseur.addCarte(carte)
+        if self.game.court == False:
+            self.game.currentState.ramasseur.addCarte(carte)
+        else:
+            self.game.currentState.ramasseur.addCarteToScore(carte)
 
-        print("[Adapteur_model] PLI : ")
-        for carte in self.game.pli:
-            print(str(carte))
-        print("[Adapteur_model] JOUEURS : ")
-        for j in self.game.listeJoueurs:
-            print(str(j))
         IvySendMsg("CMD | cartePliRamassee | " + color + " | " + value)
 
         if self.game.currentState.actionsTerminees():
             self.game.currentState.handleTurn()
+        elif isinstance(self.game.currentState.ramasseur, Bot):
+            # time.sleep(self.game.botWaitTime)
+            nomJoueur = self.game.currentState.ramasseur.getPseudo()
+            carteAJouer = self.game.pli[0]
+            action = 'ramasser'
+            self.game.controller.stockerInfosBots(action, nomJoueur, carteAJouer)
+            self.notifyCarteRamassee(self.game.pli[0])
 
     def askToHostToNotifyCarteRamassee(self, carte):
         color = str(carte.couleur)
@@ -98,7 +117,10 @@ class Adapteur_model:
     def setGameStateToDeuxiemeCoupBataille(self):
         IvySendMsg("CMD | setGameStateToDeuxiemeCoupBataille")
 
-    # Analyse une commande
+    def setGameStateToFinPartie(self):
+        IvySendMsg("CMD | setGameStateToFinPartie")
+
+    # Analyse une commande de type "CMD | Commande | PARAMS | etc..."
     def analyseCommand(self, command):
         command = command.split("|")
         actualCommand = command[1].strip()
@@ -133,7 +155,6 @@ class Adapteur_model:
             player = self.game.getPlayerByName(playerName)
             self.game.stateRamasserPli.setRamasseur(player)
         elif actualCommand == "setGameStateToRamasserPli":
-            print("[Adapteur_model] passage au mode RAMASSER")
             self.game.currentState = self.game.stateRamasserPli
             self.game.currentState.printStateName()
         elif actualCommand == "sendNotificationCarteRamasse":
@@ -147,19 +168,18 @@ class Adapteur_model:
             carte = self.game.getCardFromPli(CouleurCarte[cardColor], ValeurCarte[cardValue])
             self.game.pli.remove(carte)
             self.game.currentState.ramasseur.addCarte(carte)
-            print("[Adapteur_model] PLI : ")
-            for carte in self.game.pli:
-                print(str(carte))
-            print("[Adapteur_model] JOUEURS : ")
-            for j in self.game.listeJoueurs:
-                print(str(j))
         elif actualCommand == "setGameStateToTourNormal":
-            print("BACK TO STATE NORMAL")
             self.game.currentState = self.game.stateTourNormal
         elif actualCommand == "setGameStateToPremierCoupBataille":
             self.game.currentState = self.game.statePremierCoupBataille
         elif actualCommand == "setGameStateToDeuxiemeCoupBataille":
             self.game.currentState = self.game.stateDeuxiemeCoupBataille
+        elif actualCommand == "setGameStateToFinPartie":
+            self.game.currentState = self.game.stateFinPartie
+        elif actualCommand == "addPlayerCardToScore":
+            playerName = command[2].strip()
+            player = self.game.getPlayerByName(playerName)
+            player.listeScore.append(player.listeCartes.pop(0))
 
     # Crée un joueur et l'ajoute
     def addPlayerToGame(self, playerName):

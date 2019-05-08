@@ -17,7 +17,6 @@ client.getGUI().mainloop()
 # self.listeCartes.append(Carte(CouleurCarte.PIQUE, ValeurCarte.CINQ))
 # self.listeCartes.append(Carte(CouleurCarte.TREFLE, ValeurCarte.CINQ))
 
-
 # self.listeCartes.append(Carte(CouleurCarte.CARREAU, ValeurCarte.DAME))
 # self.listeCartes.append(Carte(CouleurCarte.COEUR, ValeurCarte.DAME))
 # self.listeCartes.append(Carte(CouleurCarte.PIQUE, ValeurCarte.DAME))

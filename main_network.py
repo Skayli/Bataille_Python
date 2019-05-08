@@ -29,6 +29,7 @@ def on_connection_change(agent, event):
         info("Connexion de %r", agent)
         count = len(IvyGetApplicationList())
         print("Count : " + str(count))
+        # count, c'est le nb de bots + le nb de joueur
         if count > 3:
             IvySendDirectMsg(agent, 0, "La partie ne peut plus accueillir de nouveaux joueurs")
             IvySendDieMsg(agent)
@@ -55,21 +56,52 @@ def on_direct_msg(agent, num_id, msg):
 IVYAPPNAME = input("Choisissez votre nom : ") #Nom du joueur
 readymsg = None
 isHost = False
-game = Game(IVYAPPNAME)
+nbBots = 0
+shortGame = False
+retourner = True
+game = Game(IVYAPPNAME, 'test')
 adapteur_model = Adapteur_model()
 game.setAdapteurModel(adapteur_model)
 
 
 while True:
-    host = input("Voulez-vous héberger ou rejoindre une partie ? ")
+    host = input("Voulez-vous héberger(h) ou rejoindre(r) une partie ? ")
     if host == "h" or host == "r":
         break
 
 if host == "h":
     ivy_bus = "127.255.255.255"
     isHost = True
+
+    while True:
+        nbBots = input("Saisissez le nombre de bots à ajouter (3 maximum) : ")
+        try:
+            nbBots = int(nbBots)
+            if (nbBots >=0) and (nbBots <= 3):
+                break
+        except ValueError:
+            pass
+
+    while True:
+        isShort = input("Voulez-vous jouer une partie longue(l) ou courte(c) ? ")
+        if isShort == "c":
+            isShort = True
+            break
+        elif isShort == "l":
+            isShort = False
+            break
+
+    while True:
+        retourner = input("Voulez-vous jouer la partie classique(c) ou sans carte retournée(r) ? ")
+        if retourner == "c":
+            retourner = True
+            break
+        elif retourner == "r":
+            retourner = False
+            break
+
 else:
-    ivy_bus =  "192.168.1.31"#input("Saissisez l'adresse IP de l'hote de la partie : ")
+    ivy_bus = input("Saissisez l'adresse IP de l'hote de la partie : ")
 
 ivy_bus = ivy_bus+":2010"
 
@@ -90,7 +122,7 @@ while 1:
 
     if msg == ".lancer":
         if isHost:
-            game.initialiser()
+            game.initialiser(nbBots, isShort, retourner)
             game.startTurn()
 
     elif msg == ".liste":

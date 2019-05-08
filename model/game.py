@@ -2,21 +2,25 @@ from model.couleurCarte import *
 from model.valeurCarte import *
 from model.carte import *
 from model.joueur import *
+from model.bot import *
 from random import randint
 from model.states.stateTourNormal import *
 from model.states.stateRamasserPli import *
 from model.states.statePremierCoupBataille import *
 from model.states.stateDeuxiemeCoupBataille import *
+from model.states.stateFinPartie import *
 
 class Game:
 
-    def __init__(self, name):
+    def __init__(self, name, controller):
         self.listeJoueurs = []
         self.listeCartes = []
         self.pli = []
         self.participantsBataille = []
         self.started = False
         self.name = name
+        self.botWaitTime = 0.5
+        self.controller = controller
 
         self.participantsTour = []
 
@@ -24,15 +28,25 @@ class Game:
         self.statePremierCoupBataille = StatePremierCoupBataille(self)
         self.stateDeuxiemeCoupBataille = StateDeuxiemeCoupBataille(self)
         self.stateRamasserPli = StateRamasserPli(self)
+        self.stateFinPartie = StateFinPartie(self)
 
         self.currentState = self.stateTourNormal
 
+        self.listeNomsBot = ["Bot Aniste", "Bot Ox", "Bot Swana"]
+
     # Initialise un paquet de carte, le mélange et le distribue aux listeJoueurs
     # de telle sorte que chacun possède le même nombre de cartes
-    def initialiser(self):
+    def initialiser(self, nbBots, isShort, retourner):
+        self.court = isShort
+        self.retourner = retourner
+
+        print("Court : " + str(self.court))
+        print("Retourner : " + str(self.retourner))
+        print("Nombre de bots : " + str(nbBots))
+
         self.initialiserListeCartes()
         self.melangerCartes()
-        self.createPlayers()
+        self.createPlayers(nbBots)
 
         for j in self.listeJoueurs:
             j.initialiser()
@@ -47,6 +61,7 @@ class Game:
     # Initialise un paquet de carte complet
     def initialiserListeCartes(self):
         self.listeCartes = []
+
         for couleur in CouleurCarte:
             for valeur in ValeurCarte:
                 self.listeCartes.append(Carte(couleur, valeur))
@@ -84,165 +99,19 @@ class Game:
     def isOver(self, joueur):
         return joueur.getNbCartes() == 0
 
+    # Lance le tour  d'action, défini par l'état actuel du jeu
     def startTurn(self):
-        if self.isFinished():
-            print("PARTIE TERMINEE")
-        else:
-            self.currentState.initialiser()
+        self.currentState.initialiser()
 
-    # A COMPLETER
+    # Check si la partie est terminée
     def isFinished(self):
-        return False
-
-    def playRound(self):
-        print("toast")
-
-        # Definir si on est dans une bataille ou pas
-        if not self.battle : # Tour normal
-            listeJoueurs = self.getListeJoueurPouvantJouer()
-
-            # Detection bataille
-            battleCard = None
-
-            for j1 in listeJoueurs:
-                for j2 in listeJoueurs:
-                    if j1 != j2 and j1.getCarteAJouer().valeur ==  j2.getCarteAJouer().valeur:
-                        if battleCard == None or battleCard < j1.getCarteAJouer():
-                            battleCard = j1.getCarteAJouer()
-
-
-            if battleCard != None:
-                # Ajout des joueurs participants à la bataille
-                self.participantsBataille = []
-
-                for j in listeJoueurs:
-                    if j.getCarteAJouer().valeur == battleCard.valeur:
-                        self.participantsBataille.append(j)
-
-                # On enlève les joueurs ne pouvant plus jouer
-                for j in self.participantsBataille:
-                    if not self.canPlayBattle(j):
-                        self.participantsBataille.remove(j)
-
-                if len(self.participantsBataille) >= 2:
-                    self.battle = True
-
-                # Ajout des cartes jouées au pli
-                for joueur in listeJoueurs:
-                    self.pli.append(joueur.listeCartes.pop(0))
-
-
-    def oneRound(self, listeJoueurs):
-        # Etape 1 : Chercher les batailles
-        battleCard = None
-
-        for j1 in listeJoueurs:
-            for j2 in listeJoueurs:
-                if j1 != j2 and j1.getCarteAJouer().valeur ==  j2.getCarteAJouer().valeur:
-                    if battleCard == None or battleCard < j1.getCarteAJouer():
-                        battleCard = j1.getCarteAJouer()
-
-        # Fin etape 1
-
-        # ----------------------------------------------------------------------------- #
-
-        # Etape 2 : Gérer la bataille ou finir le tour
-
-        # Etape 2.1 : Gérer s'il y a bataille
-        if(battleCard != None):
-            # Etape 2.1.1 Ajout des joueurs participants à la bataille
-            self.participantsBataille = []
-
-            for j in listeJoueurs:
-                if j.getCarteAJouer().valeur == battleCard.valeur:
-                    self.participantsBataille.append(j)
-
-            # Etape 2.1.2 Ajout des cartes en jeu au pli : les cartes joués par les joueurs pouvant joué au début du tour
-            for j in listeJoueurs:
-                self.pli.append(j.listeCartes.pop(0))
-
-            print("BATAILLE de " + str(battleCard.valeur))
-            for j in self.participantsBataille:
-                if not self.isOver(j):
-                    self.pli.append(j.listeCartes.pop(0))
-                    print(str(j))
-
-            print("-------------------")
+        if self.court: # Verifie si au moins 2 joueurs peuvent jouer
+            return len(self.getListeJoueurPouvantJouerUnCoup()) < 2
+        else: # Verifie si le nombre de carte non distribuées + les nombre de carte d'un joueur = 52
+            for j in self.listeJoueurs:
+                if (len(self.listeCartes) + len(j.listeCartes)) == 52:
+                    return True
             return False
-
-        # Etape 2.2 : Finir le tour
-        else:
-            #Etape 2.2.1 : Trouver le gagnant
-            gagnant = listeJoueurs[0]
-
-            for j in listeJoueurs:
-                if j.getCarteAJouer() > gagnant.getCarteAJouer():
-                    gagnant = j
-
-            for j in listeJoueurs:
-                print(j.getCarteAJouer())
-                self.pli.append(j.listeCartes.pop(0))
-
-            gagnant.listeCartes.extend(self.pli)
-            print("GAGNANT SEUL :\n" + str(j))
-
-            # Fin d'un tour de jeu : on reset pli et liste participantsBataille
-            self.pli = []
-            self.participantsBataille = []
-
-            return True
-
-        # Fin etape 2
-
-    # Effectue un tour de jeu
-    def jouerTour(self, listeJoueurs = None, listeCartesEnJeu = None):
-
-        if listeJoueurs == None:
-            listeJoueurs = self.listeJoueurs
-
-        if listeCartesEnJeu == None:
-            listeCartesEnJeu = []
-
-        # Chercher les batailles
-        battleCard = None
-
-        for j1 in listeJoueurs:
-            for j2 in listeJoueurs:
-                if j1 != j2 and j1.getCarteAJouer().valeur ==  j2.getCarteAJouer().valeur:
-                    if battleCard == None or battleCard < j1.getCarteAJouer():
-                        battleCard = j1.getCarteAJouer()
-
-
-        if(battleCard != None):
-            participantsBataille = []
-
-            for j in listeJoueurs:
-                if j.getCarteAJouer().valeur == battleCard.valeur:
-                    participantsBataille.append(j)
-
-            for j in listeJoueurs:
-                listeCartesEnJeu.append(j.listeCartes.pop(0))
-                if j in participantsBataille:
-                    listeCartesEnJeu.append(j.listeCartes.pop(0))  #carte retournée du joueur
-
-            self.jouerTour(participantsBataille, listeCartesEnJeu)
-
-        else:
-            # Trouver le gagant et lui donner les cartes en jeu
-            gagnant = listeJoueurs[0]
-
-            for j in listeJoueurs:
-                if j.getCarteAJouer() > gagnant.getCarteAJouer():
-                    gagnant = j
-
-            for j in listeJoueurs:
-                print(j.getCarteAJouer())
-                listeCartesEnJeu.append(j.listeCartes.pop(0))
-
-
-            gagnant.listeCartes.extend(listeCartesEnJeu)
-            print("GAGNANT SEUL :\n" + str(j))
-
 
     def printListeJoueurs(self):
         if(len(self.listeJoueurs) == 0):
@@ -253,23 +122,28 @@ class Game:
     def printListeCartes(self):
         print("\n".join(str(e) for e in self.listeCartes))
 
-    def getListeJoueurPouvantJouer(self):
+    def getListeJoueurPouvantJouerUnCoup(self):
         listeJ = []
         for j in self.listeJoueurs:
             if not self.isOver(j):
                 listeJ.append(j)
-
         return listeJ
 
     def canPlayBattle(self, player):
-        return player.getNbCartes() >= 2
+        if self.retourner == True: # En mode "retourner" il faut poser 2 cartes : cachée puis visible
+            return player.getNbCartes() >= 2
+        else:
+            return player.getNbCartes() >= 1 # Sinon, au moins 1
 
     # Créé les joueurs en fonction des noms des applications connectées
-    def createPlayers(self):
+    def createPlayers(self, nbBots):
         self.addJoueur(Joueur(self.name))
         listeNomJoueurs = self.adapteur_model.getPlayersName()
         for name in listeNomJoueurs:
             self.addJoueur(Joueur(name))
+
+        for i in range (0, nbBots):
+            self.addJoueur(Bot(self.listeNomsBot[i]))
 
     def setAdapteurModel(self, adapteur_model):
         self.adapteur_model = adapteur_model
@@ -291,3 +165,22 @@ class Game:
         if index < self.getNBJoueurs():
             return self.listeJoueurs[index]
         return None
+
+    def getWinner(self):
+        gagnant = []
+        if self.court == True: # Le gagnant est celui qui a le plus de cartes dans sa listeScore. Il peut y avoir plusieurs gagnants
+            max = 0
+            for joueur in self.listeJoueurs:
+                if len(joueur.listeScore) > max:
+                    gagnant = []
+                    max = len(joueur.listeScore)
+                    gagnant.append(joueur)
+                elif len(joueur.listeScore) == max:
+                    gagnant.append(joueur)
+            return gagnant
+        else: # Il n'y aura qu'un seul gagant : le seul qui a encore des cartes
+            for joueur in self.listeJoueurs:
+                if (len(self.listeCartes) + len(joueur.listeCartes)) == 52:
+                    gagnant.append(joueur)
+                    break
+            return gagnant
