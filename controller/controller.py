@@ -147,32 +147,6 @@ class Controller:
         self._window.show_frame("GameScreen")
         IvySendMsg("CMDVIEW | lancerPartie")
 
-    def validerPartieSolo(self):
-        # On reset la partie pour etre safe
-        # self._game = Game()
-        self._window.reset_screen("GameScreen")
-        self.initGameScreen()
-        # Gestion du joueur principal
-        # pseudo = self._hebergerScreen._inputPseudo.get()
-        # print('Pseudo du joueur principal %s' % pseudo)
-        # self._mainPlayer = Joueur(pseudo)
-        # self._game.addJoueur(self._mainPlayer)
-        # self._gameScreen.afficherPseudoJoueurs(self._game.getJoueur(0).getPseudo())
-        # Gestion des adversaires
-        # nombreAdversaires = int(self._hebergerScreen.getSelectedItemComboBoxAdversaires()[0])
-        # print('Nombre d\'adversaires choisi %s' % nombreAdversaires)
-        # for i in range(0,nombreAdversaires):
-        #     self._othersPlayers.append(Joueur(('Adversaire %d' % (i+1))))
-        #     self._game.addJoueur(self._othersPlayers[i])
-        #     self._gameScreen.afficherPseudoJoueurs((self._game.getJoueur(i+1).getPseudo()))
-        # # On prépare la partie
-        # self._game.distribuerCartes()
-        # self._gameScreen.cacherElementInutiles()
-        # self._gameScreen.afficherCartePile()
-        # self._gameScreen.afficheCartes(self._game.getNBJoueurs())
-        # On change d'écran
-        self._window.show_frame("GameScreen")
-
     def moveCard(self, event):
         if self._gameScreen.getCartePile() is not None:
             print('move carte')
@@ -186,6 +160,12 @@ class Controller:
                 print('entre dans selection carte')
                 # self._cartePile = self._canvas.find_closest(event.x, event.y)[0] # Le 0 c'est car on prend la 1ere
                 self._gameScreen._carteAJouer = self._gameScreen.getCanvas().find_withtag('carte_a_jouer')[0]
+                # Vérification de si c'est la dernière carte
+                if (self._game.participantsTour[0].getNbCartes() == 1):
+                    if (self._ivyBus.isHost()):
+                        self._window._adapteur_vue.notifyLastCarteAJouer(self._game.name)
+                    else:
+                        self._window._adapteur_vue.askToHostToNotifyLastCarteAJouer(self._game.name)
 
     # Sélection de la carte du Pli à récupérer
     def selectionnerCartePli(self, event):
@@ -204,24 +184,21 @@ class Controller:
                 for item in enclosedObjects:
                     if (item is self._gameScreen.getCartePile()):
                         print('carte a jouer relachee')
+                        # On vérifie si c'est la dernière carte à jouer
+                        if (self._game.participantsTour[0].getNbCartes() == 1):
+                            self._gameScreen.getCanvas().delete('carte_a_jouer')
                         # Alors on montre la carte dans la zone de jeu
                         nomJoueur = self._game.name
                         if (self._statePremierCoupBataille == False):
                             carteAJouer = self._game.getPlayerByName(self._game.name).getCarteAJouer()
                             nom_carte = carteAJouer.getNomCarte()
                             fileNameCarteAJouer = carteAJouer.getNomCarteFormatFichier()
-                            script_dir = os.path.dirname(__file__)
-                            rel_path = "..\\images\\{0}.png"
-                            abs_file_path = os.path.join(script_dir, rel_path)
-                            abs_file_path = abs_file_path.format(fileNameCarteAJouer)
                         else:
                             nom_carte = "FACE_CACHEE_{0}".format(nomJoueur)
-                            script_dir = os.path.dirname(__file__)
-                            rel_path = "../images/face_cachee.png"
-                            abs_file_path = os.path.join(script_dir, rel_path)
+                            fileNameCarteAJouer = 'face_cachee'
                         # On remet la carte face cachée à sa place d'origine et affiche la carte jouée
                         # On prévient que l'on vient de poser sa carte
-                        infosCartePosee = "{0},{1},{2},{3},{4}".format(nomJoueur, abs_file_path, nom_carte, event.x, event.y)
+                        infosCartePosee = "{0},{1},{2},{3},{4}".format(nomJoueur, fileNameCarteAJouer, nom_carte, event.x, event.y)
                         if self._ivyBus.isHost() == True:
                             self._game.adapteur_model.notifyCurrentPlayerPlayed()
                             self._window._adapteur_vue.notifyCurrentPlayerPlayed(infosCartePosee)
@@ -244,11 +221,12 @@ class Controller:
                                     # time.sleep(1)
                                     self._window._adapteur_vue.notifyCartePliRecuperee(infosCarte)
                         else:
-                            self._window._adapteur_vue.askToHostToNotifyCurrentPlayerPlayed(infosCartePosee)
                             self._game.adapteur_model.askToHostToNotifyCurrentPlayerPlayed()
+                            self._window._adapteur_vue.askToHostToNotifyCurrentPlayerPlayed(infosCartePosee)
                             self._window._adapteur_vue.askToHostToNotifyUpdateInfos(nomJoueur)
                         self._gameScreen.setPeutJouer(False)
-            self._gameScreen.resetPositionCartePile()
+            if (self._game.participantsTour[0].getNbCartes() > 1):
+                self._gameScreen.resetPositionCartePile()
         elif (self._gameScreen._cartePliSelected is not None):
             print('carte pli relachee')
             isCarteRecuperee = False

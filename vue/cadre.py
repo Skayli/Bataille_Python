@@ -9,6 +9,7 @@ from vue.gameModeScreen import *
 from vue.hebergerScreen import *
 from vue.rejoindreScreen import *
 from vue.gameScreen import *
+from vue.victoireScreen import *
 import queue as Queue
 
 class Cadre(Tk):
@@ -36,7 +37,7 @@ class Cadre(Tk):
         self.container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (MenuScreen, PseudoScreen, GameModeScreen, HebergerScreen, RejoindreScreen, GameScreen):
+        for F in (MenuScreen, PseudoScreen, GameModeScreen, HebergerScreen, RejoindreScreen, GameScreen, VictoireScreen):
             page_name = F.__name__
             frame = F(parent=self.container, mainFrame=self)
             self.frames[page_name] = frame

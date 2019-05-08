@@ -20,6 +20,7 @@ class Game:
         self.started = False
         self.name = name
         self.botWaitTime = 0.5
+        self.court = None
         self.controller = controller
 
         self.participantsTour = []
@@ -45,7 +46,7 @@ class Game:
         print("Nombre de bots : " + str(nbBots))
 
         self.initialiserListeCartes()
-        self.melangerCartes()
+        # self.melangerCartes()
         self.createPlayers(nbBots)
 
         for j in self.listeJoueurs:
@@ -61,10 +62,21 @@ class Game:
     # Initialise un paquet de carte complet
     def initialiserListeCartes(self):
         self.listeCartes = []
-
-        for couleur in CouleurCarte:
-            for valeur in ValeurCarte:
-                self.listeCartes.append(Carte(couleur, valeur))
+        self.listeCartes.append(Carte(CouleurCarte.CARREAU, ValeurCarte.DAME))
+        self.listeCartes.append(Carte(CouleurCarte.COEUR, ValeurCarte.DAME))
+        self.listeCartes.append(Carte(CouleurCarte.PIQUE, ValeurCarte.DAME))
+        self.listeCartes.append(Carte(CouleurCarte.TREFLE, ValeurCarte.DAME))
+        self.listeCartes.append(Carte(CouleurCarte.CARREAU, ValeurCarte.CINQ))
+        self.listeCartes.append(Carte(CouleurCarte.CARREAU, ValeurCarte.AS))
+        self.listeCartes.append(Carte(CouleurCarte.TREFLE, ValeurCarte.CINQ))
+        self.listeCartes.append(Carte(CouleurCarte.COEUR, ValeurCarte.AS))
+        self.listeCartes.append(Carte(CouleurCarte.CARREAU, ValeurCarte.ROI))
+        self.listeCartes.append(Carte(CouleurCarte.CARREAU, ValeurCarte.VALET))
+        self.listeCartes.append(Carte(CouleurCarte.TREFLE, ValeurCarte.ROI))
+        self.listeCartes.append(Carte(CouleurCarte.COEUR, ValeurCarte.VALET))
+        # for couleur in CouleurCarte:
+        #     for valeur in ValeurCarte:
+        #         self.listeCartes.append(Carte(couleur, valeur))
 
     #  Melange le paquet de cartes du jeu
     def melangerCartes(self):
@@ -109,7 +121,7 @@ class Game:
             return len(self.getListeJoueurPouvantJouerUnCoup()) < 2
         else: # Verifie si le nombre de carte non distribuées + les nombre de carte d'un joueur = 52
             for j in self.listeJoueurs:
-                if (len(self.listeCartes) + len(j.listeCartes)) == 52:
+                if (len(self.listeCartes) + len(j.listeCartes)) == 12:
                     return True
             return False
 
@@ -180,7 +192,7 @@ class Game:
             return gagnant
         else: # Il n'y aura qu'un seul gagant : le seul qui a encore des cartes
             for joueur in self.listeJoueurs:
-                if (len(self.listeCartes) + len(joueur.listeCartes)) == 52:
+                if (len(self.listeCartes) + len(joueur.listeCartes)) == 12:
                     gagnant.append(joueur)
                     break
             return gagnant

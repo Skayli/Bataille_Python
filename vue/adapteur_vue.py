@@ -10,6 +10,7 @@ from model.game import *
 
 import time
 import re
+import  os
 
 class Adapteur_vue:
 
@@ -52,6 +53,13 @@ class Adapteur_vue:
 
     def askToHostToNotifyUpdateInfos(self, infos):
         IvySendMsg("CMDVIEW | askToHostToNotifyUpdateInfos | {0}".format(infos))
+
+    def notifyLastCarteAJouer(self, nomJoueur):
+        self.removeLastCarteAJouer(nomJoueur)
+        IvySendMsg("CMDVIEW | notifyLastCarteAJouer | {0}".format(nomJoueur))
+
+    def askToHostToNotifyLastCarteAJouer(self, nomJoueur):
+        IvySendMsg("CMDVIEW | askToHostToNotifyLastCarteAJouer | {0}".format(nomJoueur))
 
     #Analyse une commande
     def analyseCommand(self, command):
@@ -122,6 +130,10 @@ class Adapteur_vue:
             self.updateInfos(command[2].strip())
         elif actualCommand == "askToHostToNotifyUpdateInfos":
             self.notifyUpdateInfos(command[2].strip())
+        elif actualCommand == "notifyLastCarteAJouer":
+            self.removeLastCarteAJouer(command[2].strip())
+        elif actualCommand == "askToHostToNotifyLastCarteAJouer":
+            self.notifyLastCarteAJouer(command[2].strip())
 
     def gererPoseCarte(self, infosCartePosee):
         cartePosee = infosCartePosee.split(",")
@@ -130,9 +142,13 @@ class Adapteur_vue:
         nomCarte = cartePosee[2]
         posX = cartePosee[3]
         posY = cartePosee[4]
+        script_dir = os.path.dirname(__file__)
+        rel_path = "..\\images\\{0}.png"
+        abs_file_path = os.path.join(script_dir, rel_path)
+        abs_file_path = abs_file_path.format(fileName)
+
         gameScreen = self._cadre.frames['GameScreen']
-        gameScreen.showCarte(fileName, nomCarte, posX, posY)
-        print('hello')
+        gameScreen.showCarte(abs_file_path, nomCarte, posX, posY)
 
     def updateInfos(self, infos):
         # on update le labelInfoGame
@@ -157,6 +173,10 @@ class Adapteur_vue:
                     gameScreen.setLabelInfoGame('{0} a gagné le tour, en attente du ramassage de cartes...'.format(nomJoueur))
             # Si tour terminé et Bataille premier coup
             elif game.currentState == game.statePremierCoupBataille:
+                if (len(game.participantsBataille) > (len(game.participantsTour))):
+                    gameScreen.updateLabelJoueur(nomJoueur, "{0} : Nombre de cartes restantes {1}".format(nomJoueur, joueur.getNbCartes()-1))
+                else:
+                    gameScreen.updateLabelJoueur(nomJoueur, "{0} : Nombre de cartes restantes {1}".format(nomJoueur, joueur.getNbCartes()))
                 self._cadre._controller._statePremierCoupBataille = True
                 if game.participantsTour[0].pseudo == game.name:
                     gameScreen.setLabelInfoGame('Bataille ! Posez la carte face cachée !')
@@ -164,14 +184,21 @@ class Adapteur_vue:
                     gameScreen.setLabelInfoGame('Bataille ! En attente des autres joueurs...')
             # Si tour terminé et Bataille deuxième coup
             elif game.currentState == game.stateDeuxiemeCoupBataille:
+                if (len(game.participantsBataille) > (len(game.participantsTour))):
+                    gameScreen.updateLabelJoueur(nomJoueur, "{0} : Nombre de cartes restantes {1}".format(nomJoueur, joueur.getNbCartes()-1))
+                else:
+                    gameScreen.updateLabelJoueur(nomJoueur, "{0} : Nombre de cartes restantes {1}".format(nomJoueur, joueur.getNbCartes()))
                 self._cadre._controller._statePremierCoupBataille = False
                 if game.participantsTour[0].pseudo == game.name:
                     gameScreen.setLabelInfoGame('Bataille ! Posez la carte')
                 else:
                     gameScreen.setLabelInfoGame('Bataille ! En attente des autres joueurs...')
-            elif game.currentState == game.stateFinPartie:
-                gagnant = game.getWinner()
-                gameScreen.setLabelInfoGame('Fin de partie ==> {0}'.format(gagnant[(len(gagnant)-1)]))
+        if game.currentState == game.stateFinPartie:
+            gagnant = game.getWinner()
+            victoireScreen = self._cadre.frames['VictoireScreen']
+            victoireScreen.setTextVictoire(gagnant)
+            self._cadre.show_frame('VictoireScreen')
+            # gameScreen.setLabelInfoGame('Fin de partie ==> {0}'.format(gagnant[(len(gagnant)-1)]))
 
     def gererDeplacementCarte(self, infosCarteDeplacee):
         carte = infosCarteDeplacee.split(",")
@@ -193,11 +220,19 @@ class Adapteur_vue:
         joueur = self._cadre._controller._game.getPlayerByName(nom_joueur)
         gameScreen.updateLabelJoueur(nom_joueur, joueur.getJoueurInfos())
         # Vérification de si on a terminé le ramassage
-        if (game.started == True) and game.currentState != game.stateRamasserPli:
+        if (game.started == True) and game.currentState != game.stateRamasserPli and game.currentState != game.stateFinPartie:
             if game.participantsTour[0].pseudo == game.name:
                 gameScreen.setLabelInfoGame('Ramassage terminé, c\'est à vous !')
             else:
                 gameScreen.setLabelInfoGame('Ramassage terminé, en attente des autres joueurs...')
         if game.currentState == game.stateFinPartie:
             gagnant = game.getWinner()
-            gameScreen.setLabelInfoGame('Fin de partie ==> {0}'.format(gagnant[(len(gagnant)-1)]))
+            victoireScreen = self._cadre.frames['VictoireScreen']
+            victoireScreen.setTextVictoire(gagnant)
+            self._cadre.show_frame('VictoireScreen')
+            # gameScreen.setLabelInfoGame('Fin de partie ==> {0}'.format(gagnant[(len(gagnant)-1)]))
+
+    def removeLastCarteAJouer(self, nomJoueur):
+        gameScreen = self._cadre.frames['GameScreen']
+        tag = "pile_{0}".format(nomJoueur)
+        gameScreen.getCanvas().delete(tag)

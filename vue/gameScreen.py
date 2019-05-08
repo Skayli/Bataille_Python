@@ -26,6 +26,7 @@ class GameScreen(Frame):
         self._cartePliSelected = None
         self._index_cartes_sur_tapis = 0
         self._peutJouer = False
+        self.tableau_pile_joueurs = []
         # Label titre
         label = Label(self, text="Jeu de la bataille", font=mainFrame.title_font, bg='linen')
         # label.pack(side="top", fill="x", pady=10)
@@ -56,8 +57,6 @@ class GameScreen(Frame):
 
         self.helv12 = Font(family='Helvetica', size=12, weight='bold')
         self.labelsJoueurs = {}
-        # for i in range(4):
-        #     self.labelsJoueurs[i] = Label(self, text='', font=helv12)
 
         self._labelInfoGame = Label(self, text='Que le meilleur gagne !', font=self.helv12, bg='linen')
         self._labelInfoGame.grid(row=4, column=1)
@@ -83,16 +82,20 @@ class GameScreen(Frame):
         joueurPrincipal = self.trouverJoueurPrincipal()
         haut, gauche, droite = False, False, False
         self.labelsJoueurs[joueurPrincipal].grid(row=3, column=1, ipadx=10, ipady=10)
+        self.tableau_pile_joueurs.append("pile_{0}".format(joueurPrincipal))
         for key, value in self.labelsJoueurs.items():
             if key != joueurPrincipal:
                 if haut == False:
                     self.labelsJoueurs[key].grid(row=1, column=1, ipadx=10, ipady=10)
+                    self.tableau_pile_joueurs.append("pile_{0}".format(key))
                     haut = True
                 elif gauche == False:
                     self.labelsJoueurs[key].grid(row=2, column=0, ipadx=10, ipady=10)
+                    self.tableau_pile_joueurs.append("pile_{0}".format(key))
                     gauche = True
                 elif droite == False:
                     self.labelsJoueurs[key].grid(row=2, column=2, ipadx=10, ipady=10)
+                    self.tableau_pile_joueurs.append("pile_{0}".format(key))
                     droite = True
 
     def update_dictionnaire_images(self):
@@ -201,7 +204,8 @@ class GameScreen(Frame):
                 heightCarte = photo.height()
                 x_baseCarte = widthCanvas/2
                 y_baseCarte = heightCanvas - (heightCarte/2)
-                tag = 'carte_pile_bas'
+                # tag = 'carte_pile_bas'
+                tag = self.tableau_pile_joueurs[0]
                 item = self._canvas.create_image(x_baseCarte, y_baseCarte, image=photo, tags=tag)
                 self._piles_FC[tag]=photo
                 bas = True
@@ -210,7 +214,8 @@ class GameScreen(Frame):
                 heightCarte = photo.height()
                 x_baseCarte = widthCanvas/2
                 y_baseCarte = heightCarte/2
-                tag = 'carte_pile_haut'
+                # tag = 'carte_pile_haut'
+                tag = self.tableau_pile_joueurs[1]
                 item = self._canvas.create_image(x_baseCarte, y_baseCarte, image=photo, tags=tag)
                 self._piles_FC[tag]=photo
                 haut = True
@@ -219,7 +224,8 @@ class GameScreen(Frame):
                 heightCarte = photo.height()
                 x_baseCarte = widthCarte/2
                 y_baseCarte = heightCanvas/2
-                tag = 'carte_pile_gauche'
+                # tag = 'carte_pile_gauche'
+                tag = self.tableau_pile_joueurs[2]
                 item = self._canvas.create_image(x_baseCarte, y_baseCarte, image=photo, tags=tag)
                 self._piles_FC[tag]=photo
                 gauche = True
@@ -228,21 +234,11 @@ class GameScreen(Frame):
                 heightCarte = photo.height()
                 x_baseCarte = widthCanvas - (widthCarte/2)
                 y_baseCarte = heightCanvas/2
-                tag = 'carte_pile_droite'
+                # tag = 'carte_pile_droite'
+                tag = self.tableau_pile_joueurs[3]
                 item = self._canvas.create_image(x_baseCarte, y_baseCarte, image=photo, tags=tag)
                 self._piles_FC[tag]=photo
                 droite = True
-        # widthCanvas = int(self._canvas.cget('width'))
-        # heightCanvas = int(self._canvas.cget('height'))
-        # widthCarte = photo.width()
-        # heightCarte = photo.height()
-        # self._x_BaseCarteAJouer = widthCanvas/2
-        # self._y_BaseCarteAJouer = heightCanvas - (heightCarte/2)
-        # tag = 'carte_a_jouer'
-        # item = self._canvas.create_image(self._x_BaseCarteAJouer, self._y_BaseCarteAJouer, image=photo, tags=tag)
-        # self._dict_imagesCartes[self._index_cartes_sur_tapis]= photo
-        # self._index_cartes_sur_tapis += 1
-        # self._canvas.tag_bind(item, '<Button-1>', self.selectionnerCarte)
 
     def placerCarteJouee(self, nomFichierCarte, nomCarte):
         photo = ImageTk.PhotoImage(file= nomFichierCarte)
@@ -288,9 +284,8 @@ class GameScreen(Frame):
             self._cartePile = None
 
     def showCarte(self, nomFichierCarte, nomCarte, x, y):
-        print('Dans showcarte')
+        print('AAAAAAAAAAAAAAAAAAA ' + nomFichierCarte)
         photo = ImageTk.PhotoImage(file=nomFichierCarte)
-        print('Apres creation photo')
         tag = nomCarte
         print(tag)
         item = self._canvas.create_image(x, y, image=photo, tags=tag)
