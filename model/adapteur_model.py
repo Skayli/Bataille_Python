@@ -26,6 +26,8 @@ class Adapteur_model:
         for player in self.game.listeJoueurs:
             IvySendMsg("CMD | startGame")
             IvySendMsg("CMD | addPlayer | " + player.pseudo)
+            IvySendMsg("CMD | court | {0}".format(int(self.game.court)))
+            IvySendMsg("CMD | retourner | {0}".format(int(self.game.retourner)))
             for card in player.listeCartes:
                 color = str(card.couleur)
                 value = str(card.valeur)
@@ -135,6 +137,10 @@ class Adapteur_model:
             self.addCardToPlayer(player, cardColor, cardValue)
         elif actualCommand == "startGame":
             self.game.started = True
+        elif actualCommand == "court":
+            self.game.court = bool(int(command[2].strip()))
+        elif actualCommand == "retourner":
+            self.game.retourner = bool(int(command[2].strip()))
         elif actualCommand == "resetListeParticipantsTour":
             self.game.participantsTour = []
         elif actualCommand == "addParticipantTour":

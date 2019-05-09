@@ -20,8 +20,13 @@ class VictoireScreen(Frame):
         self.labelsVictoire = []
 
     def setTextVictoire(self, infos):
+        print('infoCourt = {0}'.format(self._controller._game.court))
+        print('infoRetournee = {0}'.format(self._controller._game.retourner))
         for info in infos:
-            self.labelsVictoire.append(Label(self, text=info.getVictoireInfos(), font=self.helv, bg='linen'))
+            if self._controller._game.court == True:
+                self.labelsVictoire.append(Label(self, text=info.getVictoireInfosCourt(), font=self.helv, bg='linen'))
+            else:
+                self.labelsVictoire.append(Label(self, text=info.getVictoireInfosLong(), font=self.helv, bg='linen'))
         for label in self.labelsVictoire:
             label.pack(side="top", fill="x", pady=10, ipady=20)
 

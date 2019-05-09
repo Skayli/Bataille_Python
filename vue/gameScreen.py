@@ -35,6 +35,7 @@ class GameScreen(Frame):
         self._canvas = Canvas(self, width=800, height=600, bg='sea green')
         # Gestion évènements
         self._canvas.bind('<B1-Motion>', self.moveCard)
+        self._canvas.config(cursor="hand1")
         # Dessin du cadre dans lequel faudra placer les cartes
         self._tag_zone_jeu = 'zone_jeu'
         self._x1, self._y1, self._x2, self._y2 = 150, 150, (int(self._canvas.cget('width'))-150), (int(self._canvas.cget('height'))-150)
@@ -98,62 +99,6 @@ class GameScreen(Frame):
                     self.tableau_pile_joueurs.append("pile_{0}".format(key))
                     droite = True
 
-    def update_dictionnaire_images(self):
-        # On vide le dictionnaire
-        self._dict_imagesCartes.clear()
-
-        if len(self._liste_cartes_en_jeu) > 0:
-            script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
-            rel_path = "../images/{0}.png"
-            abs_file_path = os.path.join(script_dir, rel_path)
-            photo = ImageTk.PhotoImage(file= abs_file_path.format(self._liste_cartes_en_jeu[0]))
-            width = photo.width()
-            height = photo.height()
-
-            x, y = Utilitaire.centrer_ligne_de_cartes(len(self._liste_cartes_en_jeu), width, height, self.getCanvas())
-
-            x = x + width + (width/2)
-            print(x, ' ', y)
-            print('CANVAS DIMENSION ', self._canvas.cget('width'), self._canvas.cget('height'))
-            item = self._canvas.create_image(x,y,image=photo)
-            self._dict_imagesCartes[self._liste_cartes_en_jeu[0]]= photo
-            self._canvas.tag_bind(item, '<Button-1>', self.selectionnerCarte)
-            self._canvas.bind('<B1-Motion>', self.moveCard)
-            self._canvas.bind('<ButtonRelease-1>', self.relacherCarte)
-
-            for image in self._liste_cartes_en_jeu[1:]:
-                script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
-                rel_path = "../images/{0}.png"
-                abs_file_path = os.path.join(script_dir, rel_path)
-                photo = ImageTk.PhotoImage(file= abs_file_path.format(image))
-
-                width = photo.width()
-                height = photo.height()
-                x = x + width + (width/2)
-
-                item = self._canvas.create_image(x,y,image=photo)
-                self._dict_imagesCartes[image]= photo
-                self._canvas.tag_bind(item, '<Button-1>', self.selectionnerCarte)
-
-    def afficheCartes(self, nbJoueurs):
-        for i in range(0, (nbJoueurs-1)):
-            script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
-            rel_path = "../images/face_cachee.png"
-            abs_file_path = os.path.join(script_dir, rel_path)
-
-            photo = ImageTk.PhotoImage(file= abs_file_path)
-            widthCanvas = int(self._canvas.cget('width'))
-            heightCanvas = int(self._canvas.cget('height'))
-            widthCarte = photo.width()
-            heightCarte = photo.height()
-            x = widthCanvas/2
-            y = heightCanvas - (heightCarte/2)
-            tag = ('carte_%d' % i)
-            item = self._canvas.create_image(x, y, image=photo, tags=tag)
-            # print(item)
-            self._dict_imagesCartes[i]= photo
-            self._canvas.tag_bind(item, '<Button-1>', self.selectionnerCarte)
-
     def updateLayout(self):
         self.placerLabelsJoueurs()
         self.afficherCartesPiles()
@@ -177,11 +122,7 @@ class GameScreen(Frame):
         self._dict_imagesCartes[tag]= photo
         # self._index_cartes_sur_tapis += 1
         self._canvas.tag_bind(self._cartePile, '<Button-1>', self._controller.selectionnerCarte)
-        self._canvas.tag_bind(self._cartePile, '<Motion>', self.motionCartePile)
         # self._canvas.tag_bind(self._cartePile, '<Button-1>', self.selectionnerCarte)
-
-    def motionCartePile(self, event):
-        self._canvas.config(cursor="hand1")
 
     def afficherCartesPiles(self):
         # On vide le dictionnaire

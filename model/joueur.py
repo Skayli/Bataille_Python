@@ -36,5 +36,8 @@ class Joueur:
     def getJoueurInfos(self):
         return "{0} : Nombre de cartes restantes {1}".format(self.pseudo, self.getNbCartes())
 
-    def getVictoireInfos(self):
-        return "{0} : Nombre de cartes gagnées = {1}".format(self.pseudo, self.getNbCartes())
+    def getVictoireInfosLong(self):
+        return "{0} : Nombre de cartes en sa possession = {1}".format(self.pseudo, self.getNbCartes())
+
+    def getVictoireInfosCourt(self):
+        return "{0} : Score = {1}".format(self.pseudo, len(self.listeScore))
